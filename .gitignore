@@ -1,0 +1,12 @@
+node_modules
+.env
+dist
+__pycache__
+*.pyc
+**/venv
+postgres_data/
+postgres_log.txt
+*.log
+erp_dev.db
+install.log
+result.txt
