@@ -10,3 +10,4 @@ postgres_log.txt
 erp_dev.db
 install.log
 result.txt
+.claude/
