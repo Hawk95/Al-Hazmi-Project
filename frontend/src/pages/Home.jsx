@@ -16,7 +16,7 @@ Chart.defaults.plugins.tooltip.titleFont = { size: 11, weight: '600' };
 Chart.defaults.plugins.tooltip.bodyFont = { size: 12 };
 Chart.defaults.scale.grid.color = 'rgba(255,255,255,0.04)';
 Chart.defaults.scale.border.display = false;
-import { LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, DollarSign, AlertTriangle, Clock, Plus, UserPlus, FileText, List, Search, Bell } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, DollarSign, AlertTriangle, Clock, Plus, UserPlus, FileText, List, Search, Bell, Users } from 'lucide-react';
 import { logout, getCurrentUser } from '../api/auth';
 
 const Home = () => {
@@ -268,6 +268,11 @@ const Home = () => {
           <button className="sidebar-item" type="button" data-label="Reports">
             <BarChart2 size={15} strokeWidth={1.5} />
             Reports
+          </button>
+          <span className="sidebar-group-label">Admin</span>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/admin/users')}>
+            <Users size={15} strokeWidth={1.5} />
+            User Management
           </button>
         </nav>
 

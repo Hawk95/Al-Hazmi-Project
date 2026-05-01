@@ -589,6 +589,70 @@ body, html, #root {
   100% { transform: translateX(0); }
 }
 
+/* ── Modal ───────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 440px;
+  animation: modalOpen 180ms ease-out forwards;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border-faint);
+}
+
+.modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* ── User badges ─────────────────────────────────────── */
+.user-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.user-badge-admin  { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.user-badge-user   { background: rgba(255,255,255,0.06);   color: var(--text-muted); }
+.user-badge-active { background: rgba(5, 150, 105, 0.15);  color: #34d399; }
+.user-badge-inactive { background: rgba(229,62,62,0.12);   color: var(--accent); }
+
 @media (max-width: 992px) {
   .login-shell { grid-template-columns: 1fr; }
   .login-branding { min-height: 320px; }

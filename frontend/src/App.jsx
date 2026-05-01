@@ -3,6 +3,7 @@ import { Component } from 'react';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import ProfileSettings from './pages/ProfileSettings';
+import AdminUsers from './pages/AdminUsers';
 import { isAuthenticated } from './api/auth';
 
 class ErrorBoundary extends Component {
@@ -60,6 +61,14 @@ function App() {
             element={
               <RequireAuth>
                 <ProfileSettings />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <RequireAuth>
+                <AdminUsers />
               </RequireAuth>
             }
           />

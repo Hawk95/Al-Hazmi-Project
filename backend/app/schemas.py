@@ -23,3 +23,21 @@ class UserResponse(UserBase):
     is_active: bool
 
     model_config = {"from_attributes": True}
+
+
+class UserAdminView(BaseModel):
+    id: int
+    email: str
+    is_active: bool
+    is_admin: bool
+    created_at: str | None = None
+
+
+class CreateUserRequest(BaseModel):
+    email: str
+    password: str
+    is_admin: bool = False
+
+
+class ResetPasswordRequest(BaseModel):
+    new_password: str
