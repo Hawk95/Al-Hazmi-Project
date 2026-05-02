@@ -46,7 +46,7 @@ def get_summary(_=Depends(get_current_user), db=Depends(get_db)):
     return {
         'orders': {'total': total_orders, 'pending': pending_orders},
         'revenue': {'today': revenue_today, 'month': revenue_month},
-        'inventory': {'total_products': total_products, 'low_stock': low_stock_count, 'value': inventory_value},
+        'inventory': {'total_products': total_products, 'low_stock': low_stock_count, 'value': inventory_value, 'total_stock_kg': total_stock_kg},
         'suppliers': {'active': active_suppliers},
         'deliveries': {'today': deliveries_today},
     }
