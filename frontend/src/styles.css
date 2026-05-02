@@ -3898,3 +3898,6 @@ select.um2-input { cursor: pointer; }
 .ap-footer-count { font-size: 18px; font-weight: 700; color: var(--text-primary); }
 .ap-footer-label { font-size: 12px; color: var(--text-muted); }
 .ap-footer-sep   { color: var(--border-medium); }
+
+/* Native select option visibility fix */
+option { background: #1a1a27; color: #f2f2f7; }
