@@ -106,6 +106,9 @@ def update_order(order_id: int, payload: UpdateOrderRequest, _=Depends(get_curre
 @router.delete('/{order_id}', status_code=204)
 def delete_order(order_id: int, _=Depends(get_current_user), db=Depends(get_db)):
     cur = db.cursor()
-    cur.execute('DELETE FROM erp.orders WHERE id = %s RETURNING id', (order_id,))
+    cur.execute('SELECT id FROM erp.orders WHERE id = %s', (order_id,))
     if not cur.fetchone():
         raise HTTPException(status_code=404, detail='Order not found')
+    cur.execute('DELETE FROM erp.deliveries WHERE order_id = %s', (order_id,))
+    cur.execute('DELETE FROM erp.order_items WHERE order_id = %s', (order_id,))
+    cur.execute('DELETE FROM erp.orders WHERE id = %s', (order_id,))

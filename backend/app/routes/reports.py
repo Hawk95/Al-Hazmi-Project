@@ -34,6 +34,9 @@ def get_summary(_=Depends(get_current_user), db=Depends(get_db)):
     cur.execute("SELECT COALESCE(SUM(quantity_kg * price_per_kg),0) FROM erp.products WHERE is_active=TRUE")
     inventory_value = float(cur.fetchone()[0])
 
+    cur.execute("SELECT COALESCE(SUM(quantity_kg),0) FROM erp.products WHERE is_active=TRUE")
+    total_stock_kg = float(cur.fetchone()[0])
+
     cur.execute("SELECT COUNT(*) FROM erp.suppliers WHERE is_active=TRUE")
     active_suppliers = cur.fetchone()[0]
 
