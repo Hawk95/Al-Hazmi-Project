@@ -181,8 +181,11 @@ const Home = () => {
       <header className="dashboard-topbar">
         {/* Left: Logo */}
         <div className="header-logo">
-          <div className="header-logo-icon">M</div>
-          <span className="header-logo-name">Meat ERP</span>
+          <div className="header-logo-icon">AH</div>
+          <div className="header-logo-text">
+            <span className="header-logo-name">Al Hazmi</span>
+            <span className="header-logo-sub">Meat ERP</span>
+          </div>
         </div>
 
         {/* Center: Search */}
@@ -235,8 +238,11 @@ const Home = () => {
 
       <aside className="dashboard-sidebar">
         <div className="sidebar-logo-area">
-          <div className="header-logo-icon">M</div>
-          <span className="header-logo-name">Meat ERP</span>
+          <div className="header-logo-icon">AH</div>
+          <div className="header-logo-text">
+            <span className="header-logo-name">Al Hazmi</span>
+            <span className="header-logo-sub">Meat ERP</span>
+          </div>
         </div>
 
         <nav className="sidebar-nav">
@@ -245,27 +251,25 @@ const Home = () => {
             <LayoutDashboard size={15} strokeWidth={1.5} />
             Overview
           </button>
-          <button className="sidebar-item" type="button" data-label="Inventory">
+          <button className="sidebar-item" type="button" onClick={() => navigate('/inventory')}>
             <Package size={15} strokeWidth={1.5} />
             Inventory
           </button>
-          <button className="sidebar-item" type="button" data-label="Orders">
+          <button className="sidebar-item" type="button" onClick={() => navigate('/orders')}>
             <ShoppingCart size={15} strokeWidth={1.5} />
             Orders
-            <span className="sidebar-badge">14</span>
           </button>
-          <button className="sidebar-item" type="button" data-label="Suppliers">
+          <button className="sidebar-item" type="button" onClick={() => navigate('/suppliers')}>
             <Truck size={15} strokeWidth={1.5} />
             Suppliers
           </button>
-          <button className="sidebar-item" type="button" data-label="Deliveries">
+          <button className="sidebar-item" type="button" onClick={() => navigate('/deliveries')}>
             <MapPin size={15} strokeWidth={1.5} />
             Deliveries
-            <span className="sidebar-badge">3</span>
           </button>
 
           <span className="sidebar-group-label">Analytics</span>
-          <button className="sidebar-item" type="button" data-label="Reports">
+          <button className="sidebar-item" type="button" onClick={() => navigate('/reports')}>
             <BarChart2 size={15} strokeWidth={1.5} />
             Reports
           </button>
@@ -287,7 +291,7 @@ const Home = () => {
         </div>
       </aside>
 
-      <main className="dashboard-content">
+      <main className="dashboard-content page-enter">
         <header className="dashboard-header">
           <div className="header-left">
             <div className="header-pill">Meat ERP</div>
@@ -310,27 +314,27 @@ const Home = () => {
         </header>
 
         <div className="quick-actions-toolbar">
-          <button className="qa-btn primary" type="button" onClick={() => showComingSoon('Create Order')}>
+          <button className="qa-btn primary" type="button" onClick={() => window.open('/orders/create', '_blank')}>
             <Plus size={14} strokeWidth={1.5} />
             Create Order
           </button>
-          <button className="qa-btn" type="button" onClick={() => showComingSoon('Add Product')}>
+          <button className="qa-btn" type="button" onClick={() => navigate('/products/add')}>
             <Package size={14} strokeWidth={1.5} />
             Add Product
           </button>
-          <button className="qa-btn" type="button" onClick={() => showComingSoon('Add Supplier')}>
+          <button className="qa-btn" type="button" onClick={() => navigate('/suppliers')}>
             <UserPlus size={14} strokeWidth={1.5} />
             Add Supplier
           </button>
-          <button className="qa-btn" type="button" onClick={() => showComingSoon('Record Delivery')}>
+          <button className="qa-btn" type="button" onClick={() => navigate('/deliveries')}>
             <Truck size={14} strokeWidth={1.5} />
             Record Delivery
           </button>
-          <button className="qa-btn" type="button" onClick={() => showComingSoon('Generate Report')}>
+          <button className="qa-btn" type="button" onClick={() => navigate('/reports')}>
             <FileText size={14} strokeWidth={1.5} />
             Generate Report
           </button>
-          <button className="qa-btn" type="button" onClick={() => showComingSoon('View All Orders')}>
+          <button className="qa-btn" type="button" onClick={() => navigate('/orders')}>
             <List size={14} strokeWidth={1.5} />
             View All Orders
           </button>
@@ -395,7 +399,7 @@ const Home = () => {
               </div>
               <div className="metric-label">Revenue Today</div>
               <div className="metric-card-bottom">
-                <div className="metric-value">$18,450</div>
+                <div className="metric-value">AED 18,450</div>
                 <div className="metric-trend positive">↑ 5.6% vs yesterday</div>
               </div>
             </article>
@@ -541,7 +545,7 @@ const Home = () => {
                 </div>
                 <div className="activity-desc">
                   <div className="activity-desc-main">Low stock alert created</div>
-                  <div className="activity-desc-sub">Pork loin fell below threshold</div>
+                  <div className="activity-desc-sub">Lamb shoulder fell below threshold</div>
                 </div>
                 <span className="activity-time">38 min ago</span>
               </li>
@@ -591,10 +595,10 @@ const Home = () => {
               </div>
               <div className="low-stock-row">
                 <div className="low-stock-row-top">
-                  <span className="low-stock-name">Pork loin</span>
+                  <span className="low-stock-name">Lamb shoulder</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span className="low-stock-qty critical">8 kg / 22 min</span>
-                    <button type="button" className="reorder-btn" onClick={() => showComingSoon('Reorder pork loin')}>Reorder</button>
+                    <button type="button" className="reorder-btn" onClick={() => showComingSoon('Reorder lamb shoulder')}>Reorder</button>
                   </div>
                 </div>
                 <div className="low-stock-bar">

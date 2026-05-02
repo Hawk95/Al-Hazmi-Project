@@ -4,16 +4,18 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import ProfileSettings from './pages/ProfileSettings';
 import AdminUsers from './pages/AdminUsers';
+import Inventory from './pages/Inventory';
+import Orders from './pages/Orders';
+import Suppliers from './pages/Suppliers';
+import Deliveries from './pages/Deliveries';
+import Reports from './pages/Reports';
+import CreateOrder from './pages/CreateOrder';
+import AddProduct from './pages/AddProduct';
 import { isAuthenticated } from './api/auth';
 
 class ErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { error: null };
-  }
-  static getDerivedStateFromError(error) {
-    return { error: error.message };
-  }
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error: error.message }; }
   render() {
     if (this.state.error) {
       return (
@@ -28,11 +30,11 @@ class ErrorBoundary extends Component {
 }
 
 function RequireAuth({ children }) {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!isAuthenticated()) return <Navigate to="/login" replace />;
   return children;
 }
+
+const P = ({ children }) => <RequireAuth>{children}</RequireAuth>;
 
 function App() {
   return (
@@ -40,42 +42,18 @@ function App() {
       <ErrorBoundary>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/dashboard"
-            element={
-              <RequireAuth>
-                <Home />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <RequireAuth>
-                <ProfileSettings />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/settings/profile"
-            element={
-              <RequireAuth>
-                <ProfileSettings />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/admin/users"
-            element={
-              <RequireAuth>
-                <AdminUsers />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/"
-            element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />}
-          />
+          <Route path="/dashboard"      element={<P><Home /></P>} />
+          <Route path="/inventory"      element={<P><Inventory /></P>} />
+          <Route path="/orders"         element={<P><Orders /></P>} />
+          <Route path="/suppliers"      element={<P><Suppliers /></P>} />
+          <Route path="/deliveries"     element={<P><Deliveries /></P>} />
+          <Route path="/reports"        element={<P><Reports /></P>} />
+          <Route path="/profile"        element={<P><ProfileSettings /></P>} />
+          <Route path="/settings/profile" element={<P><ProfileSettings /></P>} />
+          <Route path="/admin/users"    element={<P><AdminUsers /></P>} />
+          <Route path="/orders/create"  element={<P><CreateOrder /></P>} />
+          <Route path="/products/add"   element={<P><AddProduct /></P>} />
+          <Route path="/" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />
           <Route path="/*" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />
         </Routes>
       </ErrorBoundary>

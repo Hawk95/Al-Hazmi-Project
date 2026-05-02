@@ -23,9 +23,11 @@ def register(user_create: UserCreate, db=Depends(get_db)):
 @router.post('/login', response_model=Token)
 def login(payload: UserCreate, db=Depends(get_db)):
     cur = db.cursor()
-    cur.execute('SELECT hashed_password FROM erp.users WHERE email = %s', (payload.email,))
+    cur.execute('SELECT hashed_password, is_active FROM erp.users WHERE email = %s', (payload.email,))
     row = cur.fetchone()
     if not row or not verify_password(payload.password, row[0]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid credentials')
-
+    if not row[1]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Account is inactive')
+    cur.execute('UPDATE erp.users SET last_login = NOW() WHERE email = %s', (payload.email,))
     return {'access_token': create_access_token(payload.email), 'token_type': 'bearer'}

@@ -13,8 +13,9 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const getUsers = () => api.get('/admin/users').then((r) => r.data);
-export const createUser = (data) => api.post('/admin/users', data).then((r) => r.data);
-export const resetPassword = (id, newPassword) =>
-  api.put(`/admin/users/${id}/password`, { new_password: newPassword }).then((r) => r.data);
-export const toggleStatus = (id) => api.put(`/admin/users/${id}/status`).then((r) => r.data);
+export const getUsers      = ()           => api.get('/admin/users').then(r => r.data);
+export const createUser    = (data)       => api.post('/admin/users', data).then(r => r.data);
+export const updateUser    = (id, data)   => api.put(`/admin/users/${id}`, data).then(r => r.data);
+export const resetPassword = (id, pwd)    => api.put(`/admin/users/${id}/password`, { new_password: pwd }).then(r => r.data);
+export const toggleStatus  = (id)         => api.put(`/admin/users/${id}/status`).then(r => r.data);
+export const deleteUser    = (id)         => api.delete(`/admin/users/${id}`);
