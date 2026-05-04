@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users,
   Search, Plus, X, Pencil, Trash2, RefreshCw, TrendingUp, CheckCircle2,
-  XCircle, User, Phone, Mail, Calendar, ChevronDown, ChevronUp,
+  XCircle, User, Phone, Mail, Calendar, ChevronDown, ChevronUp, ArrowDownLeft,
 } from 'lucide-react';
 import { getCurrentUser } from '../api/auth';
 import {
@@ -13,6 +13,7 @@ import {
 
 const EMIRATES = ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
 const MEAT_TYPES = ['Lamb', 'Beef', 'Chicken', 'Goat', 'Camel'];
+const UNITS = ['kg', 'pcs'];
 
 const EMIRATE_COLOR = {
   'Dubai':          '#2563eb',
@@ -26,8 +27,17 @@ const EMIRATE_COLOR = {
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const EMPTY_DIST = () => ({ salesman_name: '', distribution_date: today(), emirate: 'Dubai', meat_type: 'Lamb', quantity_kg: '', notes: '' });
-const EMPTY_SM   = () => ({ name: '', phone: '', email: '', is_active: true });
+const EMPTY_DIST = () => ({
+  salesman_name: '',
+  distribution_date: today(),
+  emirate: 'Dubai',
+  meat_type: 'Lamb',
+  quantity_kg: '',
+  unit: 'kg',
+  returned_qty: '',
+  notes: '',
+});
+const EMPTY_SM = () => ({ name: '', phone: '', email: '', is_active: true });
 
 const S = {
   input: { width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '9px 12px', fontSize: 13, color: '#f2f2f7', outline: 'none', boxSizing: 'border-box', cursor: 'text', caretColor: '#f2f2f7' },
@@ -36,7 +46,7 @@ const S = {
   td: { padding: '13px 14px', fontSize: 13, color: '#e5e7eb', borderBottom: '1px solid rgba(255,255,255,0.04)', verticalAlign: 'middle' },
 };
 
-function StatCard({ label, value, color, icon, sub }) {
+function StatCard({ label, value, color, icon, sub, sub2 }) {
   return (
     <div style={{ background: '#1e1e2a', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'center' }}>
       <div style={{ width: 40, height: 40, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', color, flexShrink: 0 }}>{icon}</div>
@@ -44,6 +54,7 @@ function StatCard({ label, value, color, icon, sub }) {
         <div style={{ fontSize: 22, fontWeight: 700, color: '#f2f2f7', lineHeight: 1.2 }}>{value}</div>
         <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{label}</div>
         {sub && <div style={{ fontSize: 11, color, marginTop: 2 }}>{sub}</div>}
+        {sub2 && <div style={{ fontSize: 11, color: '#ef4444', marginTop: 1 }}>{sub2}</div>}
       </div>
     </div>
   );
@@ -110,6 +121,8 @@ export default function SalesDistribution() {
       emirate: d.emirate,
       meat_type: d.meat_type,
       quantity_kg: String(d.quantity_kg),
+      unit: d.unit || 'kg',
+      returned_qty: d.returned_qty ? String(d.returned_qty) : '',
       notes: d.notes || '',
     });
     setEditingDist(d); setError(''); setDistModal(true);
@@ -118,8 +131,9 @@ export default function SalesDistribution() {
   const saveDist = async () => {
     if (!distForm.quantity_kg || isNaN(Number(distForm.quantity_kg))) { setError('Enter a valid quantity'); return; }
     if (!distForm.emirate) { setError('Select an emirate'); return; }
+    const retQty = distForm.returned_qty !== '' ? parseFloat(distForm.returned_qty) : 0;
+    if (isNaN(retQty) || retQty < 0) { setError('Enter a valid returned quantity (0 or more)'); return; }
     setSaving(true); setError('');
-    // Match typed name to an existing salesman record for FK linking
     const matched = salesmen.find(s => s.name.toLowerCase() === distForm.salesman_name.trim().toLowerCase());
     const payload = {
       salesman_id: matched ? matched.id : null,
@@ -128,6 +142,8 @@ export default function SalesDistribution() {
       emirate: distForm.emirate,
       meat_type: distForm.meat_type,
       quantity_kg: parseFloat(distForm.quantity_kg),
+      unit: distForm.unit,
+      returned_qty: retQty,
       notes: distForm.notes || null,
     };
     try {
@@ -198,7 +214,14 @@ export default function SalesDistribution() {
     return true;
   });
 
-  const todayTotal = filtered.reduce((s, d) => s + d.quantity_kg, 0);
+  const totalSent = filtered.reduce((s, d) => s + d.quantity_kg, 0);
+  const totalReturned = filtered.reduce((s, d) => s + (d.returned_qty || 0), 0);
+  const totalNet = totalSent - totalReturned;
+
+  // Modal net preview
+  const modalSent = parseFloat(distForm.quantity_kg) || 0;
+  const modalReturned = parseFloat(distForm.returned_qty) || 0;
+  const modalNet = modalSent - modalReturned;
 
   const sidebarBtn = (path, icon, label, active = false) => (
     <button type="button" onClick={() => navigate(path)}
@@ -261,10 +284,34 @@ export default function SalesDistribution() {
 
         {/* KPI Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 24 }}>
-          <StatCard label="Active Salesmen" value={loading ? '—' : (summary?.active_salesmen ?? 0)} color="#6366f1" icon={<Users size={18} />} />
-          <StatCard label="Distributed Today" value={loading ? '—' : `${(summary?.today_kg ?? 0).toFixed(1)} kg`} color="#10b981" icon={<TrendingUp size={18} />} sub={summary?.today_kg > 0 ? 'across all emirates' : ''} />
-          <StatCard label="This Month" value={loading ? '—' : `${(summary?.month_kg ?? 0).toFixed(0)} kg`} color="#3b82f6" icon={<Calendar size={18} />} />
-          <StatCard label="Top Emirate Today" value={loading ? '—' : (summary?.top_emirate_today || 'None')} color={EMIRATE_COLOR[summary?.top_emirate_today] || '#6b7280'} icon={<MapPin size={18} />} sub={summary?.per_emirate_today?.[summary.top_emirate_today] ? `${summary.per_emirate_today[summary.top_emirate_today].toFixed(1)} kg` : ''} />
+          <StatCard
+            label="Active Salesmen"
+            value={loading ? '—' : (summary?.active_salesmen ?? 0)}
+            color="#6366f1"
+            icon={<Users size={18} />}
+          />
+          <StatCard
+            label="Sent Today"
+            value={loading ? '—' : `${(summary?.today_sent ?? 0).toFixed(1)} kg`}
+            color="#3b82f6"
+            icon={<TrendingUp size={18} />}
+            sub={summary?.today_sent > 0 ? 'dispatched across emirates' : ''}
+          />
+          <StatCard
+            label="Net Sold Today"
+            value={loading ? '—' : `${(summary?.today_kg ?? 0).toFixed(1)} kg`}
+            color="#10b981"
+            icon={<CheckCircle2 size={18} />}
+            sub={summary?.today_returned > 0 ? `Returned: ${(summary.today_returned).toFixed(1)} kg` : 'No returns today'}
+            sub2={null}
+          />
+          <StatCard
+            label="Top Emirate Today"
+            value={loading ? '—' : (summary?.top_emirate_today || 'None')}
+            color={EMIRATE_COLOR[summary?.top_emirate_today] || '#6b7280'}
+            icon={<MapPin size={18} />}
+            sub={summary?.per_emirate_today?.[summary.top_emirate_today] ? `${summary.per_emirate_today[summary.top_emirate_today].toFixed(1)} kg net` : ''}
+          />
         </div>
 
         {/* Emirates Breakdown */}
@@ -279,7 +326,7 @@ export default function SalesDistribution() {
                   <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', color }}><MapPin size={14} /></div>
                   <div style={{ fontSize: 11, fontWeight: 600, color: kg > 0 ? '#f2f2f7' : '#4b5563', marginBottom: 4, lineHeight: 1.3 }}>{em}</div>
                   <div style={{ fontSize: 16, fontWeight: 700, color: kg > 0 ? color : '#374151' }}>{kg > 0 ? `${kg.toFixed(1)}` : '—'}</div>
-                  {kg > 0 && <div style={{ fontSize: 10, color: '#6b7280', marginTop: 1 }}>kg</div>}
+                  {kg > 0 && <div style={{ fontSize: 10, color: '#6b7280', marginTop: 1 }}>kg net</div>}
                 </div>
               );
             })}
@@ -342,7 +389,10 @@ export default function SalesDistribution() {
                 <input placeholder="Search…" value={search} onChange={e => setSearch(e.target.value)} style={{ ...S.input, paddingLeft: 30 }} />
               </div>
               <button type="button" onClick={() => { setDateFilter(today()); setEmirateFilter(''); setSalesmanFilter(''); setSearch(''); }} style={{ padding: '9px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280', fontSize: 12, cursor: 'pointer' }}>Reset</button>
-              <span style={{ fontSize: 12, color: '#4b5563', marginLeft: 4 }}>{filtered.length} record{filtered.length !== 1 ? 's' : ''} · {todayTotal.toFixed(1)} kg total</span>
+              <span style={{ fontSize: 12, color: '#4b5563', marginLeft: 4 }}>
+                {filtered.length} record{filtered.length !== 1 ? 's' : ''} · <span style={{ color: '#10b981' }}>{totalNet.toFixed(1)} kg net</span>
+                {totalReturned > 0 && <span style={{ color: '#6b7280' }}> (returned {totalReturned.toFixed(1)})</span>}
+              </span>
             </div>
 
             {/* Table */}
@@ -354,18 +404,22 @@ export default function SalesDistribution() {
                     <th style={S.th}>Salesman</th>
                     <th style={S.th}>Emirate</th>
                     <th style={S.th}>Meat Type</th>
-                    <th style={{ ...S.th, textAlign: 'right' }}>Qty (kg)</th>
+                    <th style={{ ...S.th, textAlign: 'right' }}>Sent</th>
+                    <th style={{ ...S.th, textAlign: 'right' }}>Returned</th>
+                    <th style={{ ...S.th, textAlign: 'right' }}>Net Sold</th>
                     <th style={S.th}>Notes</th>
                     <th style={{ ...S.th, textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr><td colSpan={7} style={{ textAlign: 'center', padding: '48px 0', color: '#4b5563', fontSize: 13 }}>Loading…</td></tr>
+                    <tr><td colSpan={9} style={{ textAlign: 'center', padding: '48px 0', color: '#4b5563', fontSize: 13 }}>Loading…</td></tr>
                   ) : filtered.length === 0 ? (
-                    <tr><td colSpan={7} style={{ textAlign: 'center', padding: '48px 0', color: '#4b5563', fontSize: 13 }}>No records found — record your first distribution</td></tr>
+                    <tr><td colSpan={9} style={{ textAlign: 'center', padding: '48px 0', color: '#4b5563', fontSize: 13 }}>No records found — record your first distribution</td></tr>
                   ) : filtered.map(d => {
                     const eColor = EMIRATE_COLOR[d.emirate] || '#6b7280';
+                    const net = d.quantity_kg - (d.returned_qty || 0);
+                    const unit = d.unit || 'kg';
                     return (
                       <tr key={d.id} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                         <td style={S.td}>
@@ -390,11 +444,25 @@ export default function SalesDistribution() {
                           </span>
                         </td>
                         <td style={{ ...S.td, textAlign: 'right' }}>
-                          <span style={{ fontSize: 15, fontWeight: 700, color: '#10b981' }}>{d.quantity_kg.toFixed(1)}</span>
-                          <span style={{ fontSize: 11, color: '#4b5563', marginLeft: 3 }}>kg</span>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: '#60a5fa' }}>{d.quantity_kg.toFixed(1)}</span>
+                          <span style={{ fontSize: 11, color: '#4b5563', marginLeft: 3 }}>{unit}</span>
+                        </td>
+                        <td style={{ ...S.td, textAlign: 'right' }}>
+                          {d.returned_qty > 0 ? (
+                            <>
+                              <span style={{ fontSize: 14, fontWeight: 600, color: '#f87171' }}>{d.returned_qty.toFixed(1)}</span>
+                              <span style={{ fontSize: 11, color: '#4b5563', marginLeft: 3 }}>{unit}</span>
+                            </>
+                          ) : (
+                            <span style={{ fontSize: 12, color: '#374151' }}>—</span>
+                          )}
+                        </td>
+                        <td style={{ ...S.td, textAlign: 'right' }}>
+                          <span style={{ fontSize: 15, fontWeight: 700, color: '#10b981' }}>{net.toFixed(1)}</span>
+                          <span style={{ fontSize: 11, color: '#4b5563', marginLeft: 3 }}>{unit}</span>
                         </td>
                         <td style={S.td}>
-                          <span style={{ fontSize: 12, color: '#6b7280', maxWidth: 180, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.notes || '—'}</span>
+                          <span style={{ fontSize: 12, color: '#6b7280', maxWidth: 140, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.notes || '—'}</span>
                         </td>
                         <td style={{ ...S.td, textAlign: 'right' }}>
                           <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
@@ -411,7 +479,19 @@ export default function SalesDistribution() {
                     <tr>
                       <td colSpan={4} style={{ padding: '12px 14px', fontSize: 12, color: '#6b7280', borderTop: '1px solid rgba(255,255,255,0.07)' }}>Total for filtered view</td>
                       <td style={{ padding: '12px 14px', textAlign: 'right', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                        <span style={{ fontSize: 15, fontWeight: 700, color: '#10b981' }}>{todayTotal.toFixed(1)}</span>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: '#60a5fa' }}>{totalSent.toFixed(1)}</span>
+                        <span style={{ fontSize: 11, color: '#4b5563', marginLeft: 3 }}>kg</span>
+                      </td>
+                      <td style={{ padding: '12px 14px', textAlign: 'right', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                        {totalReturned > 0 ? (
+                          <>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: '#f87171' }}>{totalReturned.toFixed(1)}</span>
+                            <span style={{ fontSize: 11, color: '#4b5563', marginLeft: 3 }}>kg</span>
+                          </>
+                        ) : <span style={{ fontSize: 12, color: '#374151' }}>—</span>}
+                      </td>
+                      <td style={{ padding: '12px 14px', textAlign: 'right', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: '#10b981' }}>{totalNet.toFixed(1)}</span>
                         <span style={{ fontSize: 11, color: '#4b5563', marginLeft: 3 }}>kg</span>
                       </td>
                       <td colSpan={2} style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }} />
@@ -488,7 +568,7 @@ export default function SalesDistribution() {
       {/* ── Distribution Modal ── */}
       {distModal && (
         <div onClick={() => setDistModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 20 }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#1a1a27', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, width: '100%', maxWidth: 520, overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#1a1a27', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, width: '100%', maxWidth: 560, overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
             <div style={{ padding: '20px 24px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#f2f2f7' }}>{editingDist ? 'Edit Distribution' : 'Record Distribution'}</h2>
@@ -499,6 +579,8 @@ export default function SalesDistribution() {
             <div style={{ padding: '20px 24px' }}>
               {error && <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '9px 12px', fontSize: 12, color: '#f87171', marginBottom: 16 }}>{error}</div>}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+
+                {/* Salesman */}
                 <div style={{ ...S.label, gridColumn: '1/-1' }}>
                   <span>Salesman Name</span>
                   <input
@@ -515,31 +597,72 @@ export default function SalesDistribution() {
                     ))}
                   </datalist>
                   {salesmen.length === 0 && (
-                    <span style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>
-                      No registered salesmen yet — type any name directly
-                    </span>
+                    <span style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>No registered salesmen yet — type any name directly</span>
                   )}
                 </div>
+
+                {/* Date */}
                 <div style={S.label}>
                   <span>Date</span>
                   <input type="date" value={distForm.distribution_date} onChange={e => setDistForm(p => ({ ...p, distribution_date: e.target.value }))} style={S.input} />
                 </div>
+
+                {/* Emirate */}
                 <div style={S.label}>
                   <span>Emirate *</span>
                   <select value={distForm.emirate} onChange={e => setDistForm(p => ({ ...p, emirate: e.target.value }))} style={{ ...S.input, cursor: 'pointer' }}>
                     {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
                   </select>
                 </div>
+
+                {/* Meat Type */}
                 <div style={S.label}>
                   <span>Meat Type</span>
                   <select value={distForm.meat_type} onChange={e => setDistForm(p => ({ ...p, meat_type: e.target.value }))} style={{ ...S.input, cursor: 'pointer' }}>
                     {MEAT_TYPES.map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
                 </div>
+
+                {/* Unit toggle */}
                 <div style={S.label}>
-                  <span>Quantity (kg) *</span>
-                  <input type="number" step="0.1" min="0" value={distForm.quantity_kg} onChange={e => setDistForm(p => ({ ...p, quantity_kg: e.target.value }))} placeholder="e.g. 25.5" style={S.input} />
+                  <span>Unit</span>
+                  <div style={{ display: 'flex', gap: 0, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)' }}>
+                    {UNITS.map(u => (
+                      <button key={u} type="button" onClick={() => setDistForm(p => ({ ...p, unit: u }))}
+                        style={{ flex: 1, padding: '9px 0', background: distForm.unit === u ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.04)', border: 'none', borderRight: u === 'kg' ? '1px solid rgba(255,255,255,0.12)' : 'none', color: distForm.unit === u ? '#a5b4fc' : '#6b7280', fontSize: 13, fontWeight: distForm.unit === u ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                        {u}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Quantity Sent */}
+                <div style={S.label}>
+                  <span>Quantity Sent ({distForm.unit}) *</span>
+                  <input type="number" step="0.1" min="0" value={distForm.quantity_kg} onChange={e => setDistForm(p => ({ ...p, quantity_kg: e.target.value }))} placeholder={distForm.unit === 'kg' ? 'e.g. 25.5' : 'e.g. 40'} style={S.input} />
+                </div>
+
+                {/* Quantity Returned */}
+                <div style={S.label}>
+                  <span>Returned ({distForm.unit})</span>
+                  <input type="number" step="0.1" min="0" value={distForm.returned_qty} onChange={e => setDistForm(p => ({ ...p, returned_qty: e.target.value }))} placeholder="0 if nothing returned" style={S.input} />
+                </div>
+
+                {/* Net preview */}
+                {modalSent > 0 && (
+                  <div style={{ gridColumn: '1/-1', background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 8, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 12, color: '#6b7280' }}>
+                      Net Sold: <strong style={{ color: '#10b981', fontSize: 14 }}>{modalNet.toFixed(1)} {distForm.unit}</strong>
+                    </span>
+                    {modalReturned > 0 && (
+                      <span style={{ fontSize: 11, color: '#9ca3af' }}>
+                        {modalSent.toFixed(1)} sent − {modalReturned.toFixed(1)} returned
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Notes */}
                 <div style={{ ...S.label, gridColumn: '1/-1' }}>
                   <span>Notes</span>
                   <input value={distForm.notes} onChange={e => setDistForm(p => ({ ...p, notes: e.target.value }))} placeholder="Optional notes" style={S.input} />
@@ -618,7 +741,7 @@ export default function SalesDistribution() {
           <div onClick={e => e.stopPropagation()} style={{ background: '#1a1a27', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, width: 400, padding: '24px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
             <h2 style={{ margin: '0 0 10px', fontSize: 16, fontWeight: 700, color: '#f2f2f7' }}>Delete Record</h2>
             <p style={{ fontSize: 13, color: '#9ca3af', margin: '0 0 20px', lineHeight: 1.6 }}>
-              Delete <strong style={{ color: '#f2f2f7' }}>{deleteTarget.quantity_kg} kg {deleteTarget.meat_type}</strong> to <strong style={{ color: EMIRATE_COLOR[deleteTarget.emirate] || '#f2f2f7' }}>{deleteTarget.emirate}</strong> on {deleteTarget.distribution_date}?
+              Delete <strong style={{ color: '#f2f2f7' }}>{deleteTarget.quantity_kg} {deleteTarget.unit || 'kg'} {deleteTarget.meat_type}</strong> to <strong style={{ color: EMIRATE_COLOR[deleteTarget.emirate] || '#f2f2f7' }}>{deleteTarget.emirate}</strong> on {deleteTarget.distribution_date}?
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
               <button type="button" onClick={() => setDeleteTarget(null)} style={{ padding: '9px 18px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: '#9ca3af', fontSize: 13, cursor: 'pointer' }}>Cancel</button>

@@ -33,11 +33,13 @@ class SalesmanView(BaseModel):
 
 class DistributionCreate(BaseModel):
     salesman_id: Optional[int] = None
-    salesman_name: Optional[str] = None  # free-text fallback when no salesman record exists
+    salesman_name: Optional[str] = None
     distribution_date: str
     emirate: str
     meat_type: str = 'Lamb'
     quantity_kg: float
+    unit: str = 'kg'
+    returned_qty: float = 0
     notes: Optional[str] = None
 
 class DistributionUpdate(BaseModel):
@@ -47,6 +49,8 @@ class DistributionUpdate(BaseModel):
     emirate: Optional[str] = None
     meat_type: Optional[str] = None
     quantity_kg: Optional[float] = None
+    unit: Optional[str] = None
+    returned_qty: Optional[float] = None
     notes: Optional[str] = None
 
 class DistributionView(BaseModel):
@@ -57,6 +61,8 @@ class DistributionView(BaseModel):
     emirate: str
     meat_type: str
     quantity_kg: float
+    unit: str
+    returned_qty: float
     notes: Optional[str]
     created_at: Optional[str]
 
@@ -69,7 +75,8 @@ def _row_sm(r) -> SalesmanView:
 
 _DIST_SEL = '''
     SELECT d.id, d.salesman_id, COALESCE(s.name, d.salesman_name),
-           d.distribution_date, d.emirate, d.meat_type, d.quantity_kg, d.notes, d.created_at
+           d.distribution_date, d.emirate, d.meat_type, d.quantity_kg,
+           COALESCE(d.unit,'kg'), COALESCE(d.returned_qty,0), d.notes, d.created_at
     FROM erp.daily_distributions d
     LEFT JOIN erp.salesmen s ON d.salesman_id = s.id
 '''
@@ -79,7 +86,8 @@ def _row_dist(r) -> DistributionView:
         id=r[0], salesman_id=r[1], salesman_name=r[2],
         distribution_date=str(r[3]), emirate=r[4],
         meat_type=r[5], quantity_kg=float(r[6]),
-        notes=r[7], created_at=str(r[8])[:19] if r[8] else None,
+        unit=r[7], returned_qty=float(r[8]),
+        notes=r[9], created_at=str(r[10])[:19] if r[10] else None,
     )
 
 
@@ -158,10 +166,11 @@ def create_distribution(payload: DistributionCreate, _=Depends(get_current_user)
         if row: salesman_name = row[0]
     cur.execute(
         'INSERT INTO erp.daily_distributions '
-        '(salesman_id, salesman_name, distribution_date, emirate, meat_type, quantity_kg, notes) '
-        'VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id',
+        '(salesman_id, salesman_name, distribution_date, emirate, meat_type, quantity_kg, unit, returned_qty, notes) '
+        'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id',
         (payload.salesman_id, salesman_name, payload.distribution_date,
-         payload.emirate, payload.meat_type, payload.quantity_kg, payload.notes),
+         payload.emirate, payload.meat_type, payload.quantity_kg,
+         payload.unit, payload.returned_qty, payload.notes),
     )
     new_id = cur.fetchone()[0]
     cur.execute(_DIST_SEL + ' WHERE d.id=%s', (new_id,))
@@ -182,7 +191,8 @@ def update_distribution(did: int, payload: DistributionUpdate, _=Depends(get_cur
     elif payload.salesman_name is not None:
         fields.append('salesman_name = %s'); values.append(payload.salesman_name)
     for attr, col in [('distribution_date','distribution_date'),('emirate','emirate'),
-                      ('meat_type','meat_type'),('quantity_kg','quantity_kg'),('notes','notes')]:
+                      ('meat_type','meat_type'),('quantity_kg','quantity_kg'),
+                      ('unit','unit'),('returned_qty','returned_qty'),('notes','notes')]:
         v = getattr(payload, attr)
         if v is not None: fields.append(f'{col} = %s'); values.append(v)
     if fields:
@@ -207,18 +217,19 @@ def sales_summary(_=Depends(get_current_user), db=Depends(get_db)):
     cur.execute("SELECT COUNT(*) FROM erp.salesmen WHERE is_active=TRUE")
     active_salesmen = cur.fetchone()[0]
 
-    cur.execute("SELECT COALESCE(SUM(quantity_kg),0) FROM erp.daily_distributions WHERE distribution_date=CURRENT_DATE")
-    today_kg = float(cur.fetchone()[0])
+    cur.execute("SELECT COALESCE(SUM(quantity_kg),0), COALESCE(SUM(returned_qty),0) FROM erp.daily_distributions WHERE distribution_date=CURRENT_DATE")
+    r = cur.fetchone(); today_sent = float(r[0]); today_returned = float(r[1])
+    today_kg = today_sent - today_returned  # net sold today
 
     cur.execute(
-        "SELECT COALESCE(SUM(quantity_kg),0) FROM erp.daily_distributions "
+        "SELECT COALESCE(SUM(quantity_kg),0), COALESCE(SUM(returned_qty),0) FROM erp.daily_distributions "
         "WHERE EXTRACT(MONTH FROM distribution_date)=EXTRACT(MONTH FROM CURRENT_DATE) "
         "AND EXTRACT(YEAR FROM distribution_date)=EXTRACT(YEAR FROM CURRENT_DATE)"
     )
-    month_kg = float(cur.fetchone()[0])
+    r = cur.fetchone(); month_kg = float(r[0]) - float(r[1])
 
     cur.execute(
-        "SELECT emirate, SUM(quantity_kg) FROM erp.daily_distributions "
+        "SELECT emirate, SUM(quantity_kg - COALESCE(returned_qty,0)) FROM erp.daily_distributions "
         "WHERE distribution_date=CURRENT_DATE GROUP BY emirate ORDER BY emirate"
     )
     per_emirate = {r[0]: float(r[1]) for r in cur.fetchall()}
@@ -235,6 +246,8 @@ def sales_summary(_=Depends(get_current_user), db=Depends(get_db)):
 
     return {
         'active_salesmen': active_salesmen,
+        'today_sent': today_sent,
+        'today_returned': today_returned,
         'today_kg': today_kg,
         'month_kg': month_kg,
         'top_emirate_today': top_emirate,
