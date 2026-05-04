@@ -192,6 +192,8 @@ export default function SalesDistribution() {
   const tTaken    = filtered.reduce((s, d) => s + d.quantity_kg, 0);
   const tReturned = filtered.reduce((s, d) => s + (d.returned_qty || 0), 0);
   const tSold     = tTaken - tReturned;
+  const unitSet   = [...new Set(filtered.map(d => d.unit || 'kg'))];
+  const tUnit     = unitSet.length === 1 ? unitSet[0] : 'mixed';
 
   const modalTaken    = parseFloat(distForm.quantity_kg) || 0;
   const modalReturned = parseFloat(distForm.returned_qty) || 0;
@@ -404,19 +406,19 @@ export default function SalesDistribution() {
               <span style={{ fontSize: 13 }}>
                 <span style={{ color: '#6b7280', fontSize: 11, marginRight: 5 }}>Taken</span>
                 <strong style={{ color: '#60a5fa' }}>{tTaken.toFixed(1)}</strong>
-                <span style={{ color: '#4b5563', fontSize: 11, marginLeft: 3 }}>kg</span>
+                <span style={{ color: '#4b5563', fontSize: 11, marginLeft: 3 }}>{tUnit}</span>
               </span>
               <span style={{ color: '#374151' }}>−</span>
               <span style={{ fontSize: 13 }}>
                 <span style={{ color: '#6b7280', fontSize: 11, marginRight: 5 }}>Returned</span>
                 <strong style={{ color: '#f87171' }}>{tReturned.toFixed(1)}</strong>
-                <span style={{ color: '#4b5563', fontSize: 11, marginLeft: 3 }}>kg</span>
+                <span style={{ color: '#4b5563', fontSize: 11, marginLeft: 3 }}>{tUnit}</span>
               </span>
               <span style={{ color: '#374151' }}>=</span>
               <span style={{ fontSize: 13 }}>
                 <span style={{ color: '#6b7280', fontSize: 11, marginRight: 5 }}>Sold</span>
                 <strong style={{ color: '#10b981', fontSize: 15 }}>{tSold.toFixed(1)}</strong>
-                <span style={{ color: '#4b5563', fontSize: 11, marginLeft: 3 }}>kg</span>
+                <span style={{ color: '#4b5563', fontSize: 11, marginLeft: 3 }}>{tUnit}</span>
               </span>
             </div>
 
@@ -504,14 +506,14 @@ export default function SalesDistribution() {
                       <td colSpan={4} style={{ padding: '12px 14px', fontSize: 12, color: '#4b5563', borderTop: '1px solid rgba(255,255,255,0.07)' }}>Totals</td>
                       <td style={{ padding: '12px 14px', textAlign: 'right', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
                         <strong style={{ color: '#60a5fa' }}>{tTaken.toFixed(1)}</strong>
-                        <span style={{ fontSize: 11, color: '#374151', marginLeft: 3 }}>kg</span>
+                        <span style={{ fontSize: 11, color: '#374151', marginLeft: 3 }}>{tUnit}</span>
                       </td>
                       <td style={{ padding: '12px 14px', textAlign: 'right', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                        {tReturned > 0 ? <><strong style={{ color: '#f87171' }}>{tReturned.toFixed(1)}</strong><span style={{ fontSize: 11, color: '#374151', marginLeft: 3 }}>kg</span></> : <span style={{ color: '#2d2d3a' }}>—</span>}
+                        {tReturned > 0 ? <><strong style={{ color: '#f87171' }}>{tReturned.toFixed(1)}</strong><span style={{ fontSize: 11, color: '#374151', marginLeft: 3 }}>{tUnit}</span></> : <span style={{ color: '#2d2d3a' }}>—</span>}
                       </td>
                       <td style={{ padding: '12px 14px', textAlign: 'right', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
                         <strong style={{ fontSize: 15, color: '#10b981' }}>{tSold.toFixed(1)}</strong>
-                        <span style={{ fontSize: 11, color: '#374151', marginLeft: 3 }}>kg</span>
+                        <span style={{ fontSize: 11, color: '#374151', marginLeft: 3 }}>{tUnit}</span>
                       </td>
                       <td colSpan={2} style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }} />
                     </tr>
