@@ -22,7 +22,7 @@ Chart.defaults.scale.border.display = false;
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2,
   DollarSign, AlertTriangle, Clock, Plus, UserPlus, FileText, List,
-  Search, Bell, Users, RefreshCw,
+  Search, Bell, Users, RefreshCw, TrendingUp,
 } from 'lucide-react';
 import { logout, getCurrentUser } from '../api/auth';
 import {
@@ -297,6 +297,7 @@ const Home = () => {
           <button className="sidebar-item" type="button" onClick={() => navigate('/orders')}><ShoppingCart size={15} strokeWidth={1.5} />Orders</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/suppliers')}><Truck size={15} strokeWidth={1.5} />Suppliers</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/deliveries')}><MapPin size={15} strokeWidth={1.5} />Deliveries</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/sales')}><TrendingUp size={15} strokeWidth={1.5} />Sales Distribution</button>
           <span className="sidebar-group-label">Analytics</span>
           <button className="sidebar-item" type="button" onClick={() => navigate('/reports')}><BarChart2 size={15} strokeWidth={1.5} />Reports</button>
           <span className="sidebar-group-label">Admin</span>

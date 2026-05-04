@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users,
   Search, Plus, X, Pencil, Trash2, RefreshCw, Clock, CheckCircle2,
-  XCircle, Navigation, Car, CalendarClock, ChevronDown, ChevronUp, ArrowRight
+  XCircle, Navigation, Car, CalendarClock, ChevronDown, ChevronUp, ArrowRight, TrendingUp
 } from 'lucide-react';
 import { getCurrentUser } from '../api/auth';
 import { getDeliveries, createDelivery, updateDelivery, deleteDelivery, getOrders } from '../api/erp';
@@ -231,6 +231,7 @@ export default function Deliveries() {
           {sidebarBtn('/orders', <ShoppingCart size={15} strokeWidth={1.5} />, 'Orders')}
           {sidebarBtn('/suppliers', <Truck size={15} strokeWidth={1.5} />, 'Suppliers')}
           {sidebarBtn('/deliveries', <MapPin size={15} strokeWidth={1.5} />, 'Deliveries', true)}
+          {sidebarBtn('/sales', <TrendingUp size={15} strokeWidth={1.5} />, 'Sales Distribution')}
           <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>Analytics</div>
           {sidebarBtn('/reports', <BarChart2 size={15} strokeWidth={1.5} />, 'Reports')}
           <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>Admin</div>

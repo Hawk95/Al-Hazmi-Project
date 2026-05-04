@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users,
   Search, Plus, X, Pencil, Trash2, RefreshCw, ChevronDown, ChevronUp,
-  CheckCircle2, Clock, Flame, Send, Ban, Eye
+  CheckCircle2, Clock, Flame, Send, Ban, Eye, TrendingUp
 } from 'lucide-react';
 import { getCurrentUser } from '../api/auth';
 import { getOrders, updateOrder, deleteOrder } from '../api/erp';
@@ -151,6 +151,7 @@ export default function Orders() {
           <button className="sidebar-item active" type="button"><ShoppingCart size={15} strokeWidth={1.5} />Orders</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/suppliers')}><Truck size={15} strokeWidth={1.5} />Suppliers</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/deliveries')}><MapPin size={15} strokeWidth={1.5} />Deliveries</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/sales')}><TrendingUp size={15} strokeWidth={1.5} />Sales Distribution</button>
           <span className="sidebar-group-label">Analytics</span>
           <button className="sidebar-item" type="button" onClick={() => navigate('/reports')}><BarChart2 size={15} strokeWidth={1.5} />Reports</button>
           <span className="sidebar-group-label">Admin</span>

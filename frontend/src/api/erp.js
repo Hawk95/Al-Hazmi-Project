@@ -49,6 +49,17 @@ export const createDelivery  = (data)     => api.post('/deliveries', data).then(
 export const updateDelivery  = (id, data) => api.put(`/deliveries/${id}`, data).then(r => r.data);
 export const deleteDelivery  = (id)       => api.delete(`/deliveries/${id}`);
 
+// Sales Distribution
+export const getSalesSummary        = ()         => api.get('/sales/summary').then(r => r.data);
+export const getSalesmen            = ()         => api.get('/sales/salesmen').then(r => r.data);
+export const createSalesman         = (data)     => api.post('/sales/salesmen', data).then(r => r.data);
+export const updateSalesman         = (id, data) => api.put(`/sales/salesmen/${id}`, data).then(r => r.data);
+export const deleteSalesman         = (id)       => api.delete(`/sales/salesmen/${id}`);
+export const getDistributions       = (params)   => api.get('/sales/distributions', { params }).then(r => r.data);
+export const createDistribution     = (data)     => api.post('/sales/distributions', data).then(r => r.data);
+export const updateDistribution     = (id, data) => api.put(`/sales/distributions/${id}`, data).then(r => r.data);
+export const deleteDistribution     = (id)       => api.delete(`/sales/distributions/${id}`);
+
 // Reports
 export const getReportSummary    = () => api.get('/reports/summary').then(r => r.data);
 export const getOrdersByStatus   = () => api.get('/reports/orders-by-status').then(r => r.data);
