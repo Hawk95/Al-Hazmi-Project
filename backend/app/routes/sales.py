@@ -33,6 +33,7 @@ class SalesmanView(BaseModel):
 
 class DistributionCreate(BaseModel):
     salesman_id: Optional[int] = None
+    salesman_name: Optional[str] = None  # free-text fallback when no salesman record exists
     distribution_date: str
     emirate: str
     meat_type: str = 'Lamb'
@@ -41,6 +42,7 @@ class DistributionCreate(BaseModel):
 
 class DistributionUpdate(BaseModel):
     salesman_id: Optional[int] = None
+    salesman_name: Optional[str] = None
     distribution_date: Optional[str] = None
     emirate: Optional[str] = None
     meat_type: Optional[str] = None
@@ -148,7 +150,8 @@ def list_distributions(
 @router.post('/distributions', response_model=DistributionView, status_code=201)
 def create_distribution(payload: DistributionCreate, _=Depends(get_current_user), db=Depends(get_db)):
     cur = db.cursor()
-    salesman_name = None
+    # Resolve name: FK lookup takes priority, then free-text payload.salesman_name
+    salesman_name = payload.salesman_name or None
     if payload.salesman_id:
         cur.execute('SELECT name FROM erp.salesmen WHERE id=%s', (payload.salesman_id,))
         row = cur.fetchone()
@@ -176,6 +179,8 @@ def update_distribution(did: int, payload: DistributionUpdate, _=Depends(get_cur
         cur.execute('SELECT name FROM erp.salesmen WHERE id=%s', (payload.salesman_id,))
         row = cur.fetchone()
         if row: fields.append('salesman_name = %s'); values.append(row[0])
+    elif payload.salesman_name is not None:
+        fields.append('salesman_name = %s'); values.append(payload.salesman_name)
     for attr, col in [('distribution_date','distribution_date'),('emirate','emirate'),
                       ('meat_type','meat_type'),('quantity_kg','quantity_kg'),('notes','notes')]:
         v = getattr(payload, attr)

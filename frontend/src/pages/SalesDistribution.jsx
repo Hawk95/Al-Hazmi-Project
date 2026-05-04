@@ -26,7 +26,7 @@ const EMIRATE_COLOR = {
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const EMPTY_DIST = () => ({ salesman_id: '', distribution_date: today(), emirate: 'Dubai', meat_type: 'Lamb', quantity_kg: '', notes: '' });
+const EMPTY_DIST = () => ({ salesman_name: '', distribution_date: today(), emirate: 'Dubai', meat_type: 'Lamb', quantity_kg: '', notes: '' });
 const EMPTY_SM   = () => ({ name: '', phone: '', email: '', is_active: true });
 
 const S = {
@@ -105,7 +105,7 @@ export default function SalesDistribution() {
   const openCreateDist = () => { setDistForm(EMPTY_DIST()); setEditingDist(null); setError(''); setDistModal(true); };
   const openEditDist = d => {
     setDistForm({
-      salesman_id: String(d.salesman_id || ''),
+      salesman_name: d.salesman_name || '',
       distribution_date: d.distribution_date || today(),
       emirate: d.emirate,
       meat_type: d.meat_type,
@@ -119,8 +119,11 @@ export default function SalesDistribution() {
     if (!distForm.quantity_kg || isNaN(Number(distForm.quantity_kg))) { setError('Enter a valid quantity'); return; }
     if (!distForm.emirate) { setError('Select an emirate'); return; }
     setSaving(true); setError('');
+    // Match typed name to an existing salesman record for FK linking
+    const matched = salesmen.find(s => s.name.toLowerCase() === distForm.salesman_name.trim().toLowerCase());
     const payload = {
-      salesman_id: distForm.salesman_id ? parseInt(distForm.salesman_id) : null,
+      salesman_id: matched ? matched.id : null,
+      salesman_name: distForm.salesman_name.trim() || null,
       distribution_date: distForm.distribution_date,
       emirate: distForm.emirate,
       meat_type: distForm.meat_type,
@@ -497,11 +500,25 @@ export default function SalesDistribution() {
               {error && <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '9px 12px', fontSize: 12, color: '#f87171', marginBottom: 16 }}>{error}</div>}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                 <div style={{ ...S.label, gridColumn: '1/-1' }}>
-                  <span>Salesman</span>
-                  <select value={distForm.salesman_id} onChange={e => setDistForm(p => ({ ...p, salesman_id: e.target.value }))} style={{ ...S.input, cursor: 'pointer' }}>
-                    <option value="">— Select salesman —</option>
-                    {salesmen.filter(s => s.is_active).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                  </select>
+                  <span>Salesman Name</span>
+                  <input
+                    list="salesman-suggestions"
+                    value={distForm.salesman_name}
+                    onChange={e => setDistForm(p => ({ ...p, salesman_name: e.target.value }))}
+                    placeholder="Type a name e.g. Ahmed Al Rashid"
+                    style={S.input}
+                    autoComplete="off"
+                  />
+                  <datalist id="salesman-suggestions">
+                    {salesmen.filter(s => s.is_active).map(s => (
+                      <option key={s.id} value={s.name} />
+                    ))}
+                  </datalist>
+                  {salesmen.length === 0 && (
+                    <span style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>
+                      No registered salesmen yet — type any name directly
+                    </span>
+                  )}
                 </div>
                 <div style={S.label}>
                   <span>Date</span>
