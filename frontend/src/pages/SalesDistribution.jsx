@@ -26,8 +26,11 @@ const EMIRATE_COLOR = {
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+const EMPTY_DIST = () => ({ salesman_id: '', distribution_date: today(), emirate: 'Dubai', meat_type: 'Lamb', quantity_kg: '', notes: '' });
+const EMPTY_SM   = () => ({ name: '', phone: '', email: '', is_active: true });
+
 const S = {
-  input: { width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '9px 12px', fontSize: 13, color: '#f2f2f7', outline: 'none', boxSizing: 'border-box' },
+  input: { width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '9px 12px', fontSize: 13, color: '#f2f2f7', outline: 'none', boxSizing: 'border-box', cursor: 'text', caretColor: '#f2f2f7' },
   label: { display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, fontWeight: 500, color: '#9ca3af' },
   th: { padding: '11px 14px', fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)', whiteSpace: 'nowrap' },
   td: { padding: '13px 14px', fontSize: 13, color: '#e5e7eb', borderBottom: '1px solid rgba(255,255,255,0.04)', verticalAlign: 'middle' },
@@ -68,8 +71,6 @@ export default function SalesDistribution() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteSmTarget, setDeleteSmTarget] = useState(null);
 
-  const EMPTY_DIST = { salesman_id: '', distribution_date: today(), emirate: 'Dubai', meat_type: 'Lamb', quantity_kg: '', notes: '' };
-  const EMPTY_SM = { name: '', phone: '', email: '', is_active: true };
   const [distForm, setDistForm] = useState(EMPTY_DIST);
   const [smForm, setSmForm] = useState(EMPTY_SM);
   const [saving, setSaving] = useState(false);
@@ -101,7 +102,7 @@ export default function SalesDistribution() {
   useEffect(() => { loadAll(); }, []);
 
   // ── Distribution modal ────────────────────────────────────────────────────
-  const openCreateDist = () => { setDistForm(EMPTY_DIST); setEditingDist(null); setError(''); setDistModal(true); };
+  const openCreateDist = () => { setDistForm(EMPTY_DIST()); setEditingDist(null); setError(''); setDistModal(true); };
   const openEditDist = d => {
     setDistForm({
       salesman_id: String(d.salesman_id || ''),
@@ -153,7 +154,7 @@ export default function SalesDistribution() {
   };
 
   // ── Salesman modal ────────────────────────────────────────────────────────
-  const openCreateSm = () => { setSmForm(EMPTY_SM); setEditingSm(null); setError(''); setSmModal(true); };
+  const openCreateSm = () => { setSmForm(EMPTY_SM()); setEditingSm(null); setError(''); setSmModal(true); };
   const openEditSm = s => { setSmForm({ name: s.name, phone: s.phone || '', email: s.email || '', is_active: s.is_active }); setEditingSm(s); setError(''); setSmModal(true); };
 
   const saveSm = async () => {
@@ -495,37 +496,37 @@ export default function SalesDistribution() {
             <div style={{ padding: '20px 24px' }}>
               {error && <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '9px 12px', fontSize: 12, color: '#f87171', marginBottom: 16 }}>{error}</div>}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <label style={{ ...S.label, gridColumn: '1/-1' }}>
-                  Salesman
-                  <select value={distForm.salesman_id} onChange={e => setDistForm(p => ({ ...p, salesman_id: e.target.value }))} style={S.input}>
+                <div style={{ ...S.label, gridColumn: '1/-1' }}>
+                  <span>Salesman</span>
+                  <select value={distForm.salesman_id} onChange={e => setDistForm(p => ({ ...p, salesman_id: e.target.value }))} style={{ ...S.input, cursor: 'pointer' }}>
                     <option value="">— Select salesman —</option>
                     {salesmen.filter(s => s.is_active).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
-                </label>
-                <label style={S.label}>
-                  Date
+                </div>
+                <div style={S.label}>
+                  <span>Date</span>
                   <input type="date" value={distForm.distribution_date} onChange={e => setDistForm(p => ({ ...p, distribution_date: e.target.value }))} style={S.input} />
-                </label>
-                <label style={S.label}>
-                  Emirate *
-                  <select value={distForm.emirate} onChange={e => setDistForm(p => ({ ...p, emirate: e.target.value }))} style={S.input}>
+                </div>
+                <div style={S.label}>
+                  <span>Emirate *</span>
+                  <select value={distForm.emirate} onChange={e => setDistForm(p => ({ ...p, emirate: e.target.value }))} style={{ ...S.input, cursor: 'pointer' }}>
                     {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
                   </select>
-                </label>
-                <label style={S.label}>
-                  Meat Type
-                  <select value={distForm.meat_type} onChange={e => setDistForm(p => ({ ...p, meat_type: e.target.value }))} style={S.input}>
+                </div>
+                <div style={S.label}>
+                  <span>Meat Type</span>
+                  <select value={distForm.meat_type} onChange={e => setDistForm(p => ({ ...p, meat_type: e.target.value }))} style={{ ...S.input, cursor: 'pointer' }}>
                     {MEAT_TYPES.map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
-                </label>
-                <label style={S.label}>
-                  Quantity (kg) *
+                </div>
+                <div style={S.label}>
+                  <span>Quantity (kg) *</span>
                   <input type="number" step="0.1" min="0" value={distForm.quantity_kg} onChange={e => setDistForm(p => ({ ...p, quantity_kg: e.target.value }))} placeholder="e.g. 25.5" style={S.input} />
-                </label>
-                <label style={{ ...S.label, gridColumn: '1/-1' }}>
-                  Notes
+                </div>
+                <div style={{ ...S.label, gridColumn: '1/-1' }}>
+                  <span>Notes</span>
                   <input value={distForm.notes} onChange={e => setDistForm(p => ({ ...p, notes: e.target.value }))} placeholder="Optional notes" style={S.input} />
-                </label>
+                </div>
               </div>
             </div>
             <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
@@ -549,12 +550,38 @@ export default function SalesDistribution() {
             <div style={{ padding: '20px 24px' }}>
               {error && <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '9px 12px', fontSize: 12, color: '#f87171', marginBottom: 16 }}>{error}</div>}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <label style={S.label}>Full Name *<input value={smForm.name} onChange={e => setSmForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Ahmed Al Rashid" style={S.input} /></label>
-                <label style={S.label}>Phone<input value={smForm.phone} onChange={e => setSmForm(p => ({ ...p, phone: e.target.value }))} placeholder="+971 50 000 0000" style={S.input} /></label>
-                <label style={S.label}>Email<input type="email" value={smForm.email} onChange={e => setSmForm(p => ({ ...p, email: e.target.value }))} placeholder="salesman@alhazmi.com" style={S.input} /></label>
+                <div style={S.label}>
+                  <span>Full Name *</span>
+                  <input
+                    autoFocus
+                    value={smForm.name}
+                    onChange={e => setSmForm(p => ({ ...p, name: e.target.value }))}
+                    placeholder="e.g. Ahmed Al Rashid"
+                    style={S.input}
+                  />
+                </div>
+                <div style={S.label}>
+                  <span>Phone</span>
+                  <input
+                    value={smForm.phone}
+                    onChange={e => setSmForm(p => ({ ...p, phone: e.target.value }))}
+                    placeholder="+971 50 000 0000"
+                    style={S.input}
+                  />
+                </div>
+                <div style={S.label}>
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    value={smForm.email}
+                    onChange={e => setSmForm(p => ({ ...p, email: e.target.value }))}
+                    placeholder="salesman@alhazmi.com"
+                    style={S.input}
+                  />
+                </div>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#9ca3af', cursor: 'pointer' }}>
                   <input type="checkbox" checked={smForm.is_active} onChange={e => setSmForm(p => ({ ...p, is_active: e.target.checked }))} style={{ width: 14, height: 14, cursor: 'pointer' }} />
-                  Active
+                  Active salesman
                 </label>
               </div>
             </div>
