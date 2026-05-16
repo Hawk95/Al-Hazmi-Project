@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { getCurrentUser } from '../api/auth';
 import { getUsers, createUser, updateUser, resetPassword, toggleStatus, deleteUser } from '../api/admin';
+import { toggleHRAccess } from '../api/erp';
 
 const EMPTY_CREATE = { email: '', password: '', full_name: '', phone: '', is_admin: false };
 const EMPTY_EDIT   = { email: '', full_name: '', phone: '', is_admin: false };
@@ -324,6 +325,7 @@ export default function AdminUsers() {
                   <th className="um2-th">Username</th>
                   <SortTh field="is_active">Status</SortTh>
                   <SortTh field="is_admin">Role</SortTh>
+                  <th className="um2-th">HR Access</th>
                   <SortTh field="created_at">Joined Date</SortTh>
                   <SortTh field="last_login">Last Active</SortTh>
                   <th className="um2-th">Actions</th>
@@ -331,7 +333,7 @@ export default function AdminUsers() {
               </thead>
               <tbody>
                 {paginated.length === 0 ? (
-                  <tr><td colSpan={9} className="um2-state-row">No users match your filters</td></tr>
+                  <tr><td colSpan={10} className="um2-state-row">No users match your filters</td></tr>
                 ) : paginated.map(user => {
                   const av = avatarColor(user.full_name || user.email);
                   const username = (user.full_name ? user.full_name.toLowerCase().replace(/\s+/g, '') : user.email.split('@')[0]);
@@ -356,6 +358,26 @@ export default function AdminUsers() {
                         </span>
                       </td>
                       <td className="um2-td-secondary">{user.is_admin ? 'Admin' : 'User'}</td>
+                      <td>
+                        {user.is_admin ? (
+                          <span style={{ fontSize: 11, color: '#6b7280', fontStyle: 'italic' }}>Always</span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const updated = await toggleHRAccess(user.id);
+                                setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+                                showToast(`HR access ${updated.hr_access ? 'granted' : 'revoked'} for ${updated.email}`);
+                              } catch { showToast('Failed to update HR access'); }
+                            }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, background: user.hr_access ? 'rgba(16,185,129,0.12)' : 'rgba(107,114,128,0.1)', border: `1px solid ${user.hr_access ? 'rgba(16,185,129,0.3)' : 'rgba(107,114,128,0.25)'}`, borderRadius: 20, padding: '3px 12px', fontSize: 11, fontWeight: 600, color: user.hr_access ? '#10b981' : '#6b7280', cursor: 'pointer' }}
+                          >
+                            <span style={{ width: 7, height: 7, borderRadius: '50%', background: user.hr_access ? '#10b981' : '#4b5563' }} />
+                            {user.hr_access ? 'Granted' : 'No Access'}
+                          </button>
+                        )}
+                      </td>
                       <td className="um2-td-secondary">{formatDate(user.created_at)}</td>
                       <td className="um2-td-secondary">{timeAgo(user.last_login)}</td>
                       <td>

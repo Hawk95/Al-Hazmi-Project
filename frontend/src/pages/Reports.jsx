@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users, AlertTriangle, TrendingUp, DollarSign, RefreshCw } from 'lucide-react';
-import { getCurrentUser } from '../api/auth';
+import { LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users, AlertTriangle, TrendingUp, DollarSign, RefreshCw, Zap, UserCheck } from 'lucide-react';
+import { getCurrentUser, hasHRAccess } from '../api/auth';
 import { getReportSummary, getLowStockReport, getTopProducts, getOrdersByStatus } from '../api/erp';
 
 const STATUS_COLOR = { pending: '#D97706', confirmed: '#2563EB', preparing: '#7C3AED', dispatched: '#EA580C', delivered: '#059669', cancelled: '#6B7280' };
@@ -48,8 +48,12 @@ export default function Reports() {
           <button className="sidebar-item" type="button" onClick={() => navigate('/orders')}><ShoppingCart size={15} strokeWidth={1.5} />Orders</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/suppliers')}><Truck size={15} strokeWidth={1.5} />Suppliers</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/deliveries')}><MapPin size={15} strokeWidth={1.5} />Deliveries</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/sales')}><TrendingUp size={15} strokeWidth={1.5} />Sales Distribution</button>
           <span className="sidebar-group-label">Analytics</span>
           <button className="sidebar-item active" type="button"><BarChart2 size={15} strokeWidth={1.5} />Reports</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/forecast')}><Zap size={15} strokeWidth={1.5} />AI Forecast</button>
+          {hasHRAccess() && <span className="sidebar-group-label">People</span>}
+          {hasHRAccess() && <button className="sidebar-item" type="button" onClick={() => navigate('/hr')}><UserCheck size={15} strokeWidth={1.5} />HR Attendance</button>}
           <span className="sidebar-group-label">Admin</span>
           <button className="sidebar-item" type="button" onClick={() => navigate('/admin/users')}><Users size={15} strokeWidth={1.5} />User Management</button>
         </nav>

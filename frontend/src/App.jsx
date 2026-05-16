@@ -1,5 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { Component } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, Component } from 'react';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import ProfileSettings from './pages/ProfileSettings';
@@ -12,6 +12,11 @@ import Reports from './pages/Reports';
 import CreateOrder from './pages/CreateOrder';
 import AddProduct from './pages/AddProduct';
 import SalesDistribution from './pages/SalesDistribution';
+import Forecast from './pages/Forecast';
+import HR from './pages/HR';
+import EmployeePortal from './pages/EmployeePortal';
+import PurchaseOrders from './pages/PurchaseOrders';
+import SaleOrders from './pages/SaleOrders';
 import { isAuthenticated } from './api/auth';
 
 class ErrorBoundary extends Component {
@@ -38,6 +43,22 @@ function RequireAuth({ children }) {
 const P = ({ children }) => <RequireAuth>{children}</RequireAuth>;
 
 function App() {
+  const location  = useLocation();
+  const navigate  = useNavigate();
+  const [showHR, setShowHR] = useState(false);
+  const prevPath  = useRef('/dashboard');
+
+  useEffect(() => {
+    if (location.pathname === '/hr') {
+      setShowHR(true);
+      navigate(prevPath.current, { replace: true });
+    } else {
+      prevPath.current = location.pathname;
+    }
+  }, [location.pathname]);
+
+  const closeHR = () => setShowHR(false);
+
   return (
     <div className="app-shell">
       <ErrorBoundary>
@@ -54,10 +75,21 @@ function App() {
           <Route path="/admin/users"    element={<P><AdminUsers /></P>} />
           <Route path="/orders/create"  element={<P><CreateOrder /></P>} />
           <Route path="/products/add"   element={<P><AddProduct /></P>} />
-          <Route path="/sales"          element={<P><SalesDistribution /></P>} />
+          <Route path="/sales"             element={<P><SalesDistribution /></P>} />
+          <Route path="/forecast"          element={<P><Forecast /></P>} />
+          <Route path="/purchase-orders"   element={<P><PurchaseOrders /></P>} />
+          <Route path="/sale-orders"       element={<P><SaleOrders /></P>} />
+          <Route path="/portal"            element={<EmployeePortal />} />
           <Route path="/" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />
           <Route path="/*" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />
         </Routes>
+
+        {showHR && isAuthenticated() && (
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 500, background: '#13131a', display: 'flex', flexDirection: 'column' }}>
+            <HR isModal onClose={closeHR} />
+          </div>
+        )}
       </ErrorBoundary>
     </div>
   );

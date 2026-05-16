@@ -27,16 +27,22 @@ def _row_to_user(row) -> UserAdminView:
         is_admin=row[5],
         created_at=str(row[6])[:19] if row[6] else None,
         last_login=str(row[7])[:19] if row[7] else None,
+        hr_access=row[8] if len(row) > 8 else False,
     )
 
 
-_SELECT = 'SELECT id, email, full_name, phone, is_active, is_admin, created_at, last_login FROM erp.users'
+_SELECT = '''
+    SELECT u.id, u.email, u.full_name, u.phone, u.is_active, u.is_admin,
+           u.created_at, u.last_login,
+           EXISTS(SELECT 1 FROM erp.user_permissions p WHERE p.user_id=u.id AND p.permission='hr') AS hr_access
+    FROM erp.users u
+'''
 
 
 @router.get('/users', response_model=List[UserAdminView])
 def list_users(_=Depends(require_admin), db=Depends(get_db)):
     cur = db.cursor()
-    cur.execute(_SELECT + ' ORDER BY id')
+    cur.execute(_SELECT + ' ORDER BY u.id')
     return [_row_to_user(r) for r in cur.fetchall()]
 
 
@@ -48,9 +54,11 @@ def create_user(payload: CreateUserRequest, _=Depends(require_admin), db=Depends
         raise HTTPException(status_code=400, detail='Email already registered')
     cur.execute(
         'INSERT INTO erp.users (email, hashed_password, full_name, phone, is_active, is_admin) '
-        'VALUES (%s, %s, %s, %s, TRUE, %s) RETURNING id, email, full_name, phone, is_active, is_admin, created_at, last_login',
+        'VALUES (%s, %s, %s, %s, TRUE, %s) RETURNING id',
         (payload.email, hash_password(payload.password), payload.full_name, payload.phone, payload.is_admin),
     )
+    new_id = cur.fetchone()[0]
+    cur.execute(_SELECT + ' WHERE u.id=%s', (new_id,))
     return _row_to_user(cur.fetchone())
 
 
@@ -79,15 +87,12 @@ def update_user(user_id: int, payload: UpdateUserRequest, admin=Depends(require_
         fields.append('is_admin = %s'); values.append(payload.is_admin)
 
     if not fields:
-        cur.execute(_SELECT + ' WHERE id = %s', (user_id,))
+        cur.execute(_SELECT + ' WHERE u.id = %s', (user_id,))
         return _row_to_user(cur.fetchone())
 
     values.append(user_id)
-    cur.execute(
-        f'UPDATE erp.users SET {", ".join(fields)} WHERE id = %s '
-        'RETURNING id, email, full_name, phone, is_active, is_admin, created_at, last_login',
-        values,
-    )
+    cur.execute(f'UPDATE erp.users SET {", ".join(fields)} WHERE id = %s', values)
+    cur.execute(_SELECT + ' WHERE u.id = %s', (user_id,))
     return _row_to_user(cur.fetchone())
 
 
@@ -105,14 +110,25 @@ def reset_password(user_id: int, payload: ResetPasswordRequest, _=Depends(requir
 def toggle_status(user_id: int, _=Depends(require_admin), db=Depends(get_db)):
     cur = db.cursor()
     cur.execute('SELECT is_active FROM erp.users WHERE id = %s', (user_id,))
-    row = cur.fetchone()
-    if not row:
+    if not cur.fetchone():
         raise HTTPException(status_code=404, detail='User not found')
-    cur.execute(
-        'UPDATE erp.users SET is_active = NOT is_active WHERE id = %s '
-        'RETURNING id, email, full_name, phone, is_active, is_admin, created_at, last_login',
-        (user_id,),
-    )
+    cur.execute('UPDATE erp.users SET is_active = NOT is_active WHERE id = %s', (user_id,))
+    cur.execute(_SELECT + ' WHERE u.id = %s', (user_id,))
+    return _row_to_user(cur.fetchone())
+
+
+@router.put('/users/{user_id}/hr-access', response_model=UserAdminView)
+def toggle_hr_access(user_id: int, _=Depends(require_admin), db=Depends(get_db)):
+    cur = db.cursor()
+    cur.execute('SELECT id FROM erp.users WHERE id = %s', (user_id,))
+    if not cur.fetchone():
+        raise HTTPException(status_code=404, detail='User not found')
+    cur.execute('SELECT 1 FROM erp.user_permissions WHERE user_id=%s AND permission=%s', (user_id, 'hr'))
+    if cur.fetchone():
+        cur.execute('DELETE FROM erp.user_permissions WHERE user_id=%s AND permission=%s', (user_id, 'hr'))
+    else:
+        cur.execute('INSERT INTO erp.user_permissions (user_id, permission) VALUES (%s,%s)', (user_id, 'hr'))
+    cur.execute(_SELECT + ' WHERE u.id = %s', (user_id,))
     return _row_to_user(cur.fetchone())
 
 

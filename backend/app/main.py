@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import auth, admin, suppliers, products, orders, deliveries, reports, sales
+from app.routes import auth, admin, suppliers, products, orders, deliveries, reports, sales, hr, stock
 from app.core.config import settings
 
 app = FastAPI(title='Meat Distribution ERP')
@@ -29,6 +29,8 @@ app.include_router(orders.router,      prefix='/api/orders',     tags=['orders']
 app.include_router(deliveries.router,  prefix='/api/deliveries', tags=['deliveries'])
 app.include_router(reports.router,     prefix='/api/reports',    tags=['reports'])
 app.include_router(sales.router,       prefix='/api/sales',      tags=['sales'])
+app.include_router(hr.router,          prefix='/api/hr',         tags=['hr'])
+app.include_router(stock.router,       prefix='/api/stock',      tags=['stock'])
 
 
 if __name__ == '__main__':

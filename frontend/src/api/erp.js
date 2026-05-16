@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken } from './auth';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8003/api',
+  baseURL: import.meta.env.VITE_API_URL || `http://${window.location.hostname}:8003/api`,
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
 });
@@ -59,6 +59,52 @@ export const getDistributions       = (params)   => api.get('/sales/distribution
 export const createDistribution     = (data)     => api.post('/sales/distributions', data).then(r => r.data);
 export const updateDistribution     = (id, data) => api.put(`/sales/distributions/${id}`, data).then(r => r.data);
 export const deleteDistribution     = (id)       => api.delete(`/sales/distributions/${id}`);
+
+// HR
+export const toggleHRAccess      = (id)       => api.put(`/admin/users/${id}/hr-access`).then(r => r.data);
+export const getEmployees        = ()         => api.get('/hr/employees').then(r => r.data);
+export const createEmployee      = (data)     => api.post('/hr/employees', data).then(r => r.data);
+export const updateEmployee      = (id, data) => api.put(`/hr/employees/${id}`, data).then(r => r.data);
+export const deleteEmployee      = (id)       => api.delete(`/hr/employees/${id}`);
+export const getAttendance       = (date)     => api.get('/hr/attendance', { params: { date } }).then(r => r.data);
+export const saveAttendanceBulk  = (data)     => api.post('/hr/attendance/bulk', data).then(r => r.data);
+export const getHRSummary        = ()         => api.get('/hr/summary').then(r => r.data);
+export const getPayroll          = (month)    => api.get('/hr/payroll', { params: { month } }).then(r => r.data);
+
+// Portal (employee self-service — uses emp_token, no admin auth)
+const portalApi = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || `http://${window.location.hostname}:8003/api`,
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 15000,
+});
+portalApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('emp_token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+export const portalGetEmployees = ()     => portalApi.get('/hr/portal/employees').then(r => r.data);
+export const portalLogin        = (data) => portalApi.post('/hr/portal/login', data).then(r => r.data);
+export const portalGetStatus    = ()     => portalApi.get('/hr/portal/status').then(r => r.data);
+export const portalCheckIn      = (data) => portalApi.post('/hr/portal/checkin', data).then(r => r.data);
+export const portalCheckOut     = (data) => portalApi.post('/hr/portal/checkout', data).then(r => r.data);
+
+// Stock Flow
+export const getStockSummary       = ()         => api.get('/stock/summary').then(r => r.data);
+export const getPurchaseOrders     = ()         => api.get('/stock/purchase-orders').then(r => r.data);
+export const createPurchaseOrder   = (data)     => api.post('/stock/purchase-orders', data).then(r => r.data);
+export const approvePO             = (id)       => api.put(`/stock/purchase-orders/${id}/approve`).then(r => r.data);
+export const transitPO             = (id)       => api.put(`/stock/purchase-orders/${id}/transit`).then(r => r.data);
+export const receivePO             = (id, data) => api.post(`/stock/purchase-orders/${id}/receive`, data).then(r => r.data);
+export const getSaleOrders         = ()         => api.get('/stock/sale-orders').then(r => r.data);
+export const createSaleOrder       = (data)     => api.post('/stock/sale-orders', data).then(r => r.data);
+export const approveSO             = (id)       => api.put(`/stock/sale-orders/${id}/approve`).then(r => r.data);
+export const dispatchSO            = (id)       => api.put(`/stock/sale-orders/${id}/dispatch`).then(r => r.data);
+export const deliverSO             = (id)       => api.put(`/stock/sale-orders/${id}/deliver`).then(r => r.data);
+export const rejectSO              = (id, data) => api.put(`/stock/sale-orders/${id}/reject`, data).then(r => r.data);
+export const getReturns            = ()         => api.get('/stock/returns').then(r => r.data);
+export const confirmReturn         = (id)       => api.put(`/stock/returns/${id}/confirm`).then(r => r.data);
+export const getInvoices           = ()         => api.get('/stock/invoices').then(r => r.data);
 
 // Reports
 export const getReportSummary    = () => api.get('/reports/summary').then(r => r.data);

@@ -22,11 +22,11 @@ Chart.defaults.scale.border.display = false;
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2,
   DollarSign, AlertTriangle, Clock, Plus, UserPlus, FileText, List,
-  Search, Bell, Users, RefreshCw, TrendingUp,
+  Search, Bell, Users, RefreshCw, TrendingUp, Zap, UserCheck, ClipboardList, FileCheck,
 } from 'lucide-react';
-import { logout, getCurrentUser } from '../api/auth';
+import { logout, getCurrentUser, hasHRAccess } from '../api/auth';
 import {
-  getReportSummary, getOrdersByStatus, getLowStockReport, getRevenueTrend, getOrders,
+  getReportSummary, getOrdersByStatus, getLowStockReport, getRevenueTrend, getOrders, getStockSummary,
 } from '../api/erp';
 
 const STATUS_COLOR = {
@@ -120,6 +120,7 @@ const Home = () => {
   const [recentOrders, setRecentOrders] = useState([]);
   const [revenueTrend, setRevenueTrend] = useState([]);
   const [ordersByStatus, setOrdersByStatus] = useState([]);
+  const [stockSummary, setStockSummary] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   const loadDashboard = () => {
@@ -130,12 +131,14 @@ const Home = () => {
       getLowStockReport(),
       getRevenueTrend(),
       getOrders(),
-    ]).then(([summary, byStatus, lowStock, trend, orders]) => {
+      getStockSummary(),
+    ]).then(([summary, byStatus, lowStock, trend, orders, stock]) => {
       setDashData(summary);
       setOrdersByStatus(byStatus);
       setLowStockItems(lowStock.slice(0, 5));
       setRevenueTrend(trend);
       setRecentOrders(orders.slice(0, 5));
+      setStockSummary(stock);
     }).catch(() => {}).finally(() => setDataLoading(false));
   };
 
@@ -294,12 +297,17 @@ const Home = () => {
           <span className="sidebar-group-label">Main</span>
           <button className="sidebar-item active" type="button"><LayoutDashboard size={15} strokeWidth={1.5} />Overview</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/inventory')}><Package size={15} strokeWidth={1.5} />Inventory</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/purchase-orders')}><ClipboardList size={15} strokeWidth={1.5} />Purchase Orders</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/sale-orders')}><FileCheck size={15} strokeWidth={1.5} />Sale Orders</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/orders')}><ShoppingCart size={15} strokeWidth={1.5} />Orders</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/suppliers')}><Truck size={15} strokeWidth={1.5} />Suppliers</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/deliveries')}><MapPin size={15} strokeWidth={1.5} />Deliveries</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/sales')}><TrendingUp size={15} strokeWidth={1.5} />Sales Distribution</button>
           <span className="sidebar-group-label">Analytics</span>
           <button className="sidebar-item" type="button" onClick={() => navigate('/reports')}><BarChart2 size={15} strokeWidth={1.5} />Reports</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/forecast')}><Zap size={15} strokeWidth={1.5} />AI Forecast</button>
+          {hasHRAccess() && <span className="sidebar-group-label">People</span>}
+          {hasHRAccess() && <button className="sidebar-item" type="button" onClick={() => navigate('/hr')}><UserCheck size={15} strokeWidth={1.5} />HR Attendance</button>}
           <span className="sidebar-group-label">Admin</span>
           <button className="sidebar-item" type="button" onClick={() => navigate('/admin/users')}><Users size={15} strokeWidth={1.5} />User Management</button>
         </nav>
@@ -348,16 +356,21 @@ const Home = () => {
         {/* ── KPI Cards ── */}
         <section className="metric-section">
           <div className="metric-grid-4">
-            <article className="metric-card">
+            <article className="metric-card" onClick={() => navigate('/sale-orders')} style={{ cursor: 'pointer' }}>
               <div className="metric-card-row1">
                 <Package size={16} strokeWidth={1.5} className="metric-icon" />
-                <span className="metric-badge positive">Stock</span>
+                <span className="metric-badge positive">Available</span>
               </div>
-              <div className="metric-label">Stock Available</div>
+              <div className="metric-label">Available Stock</div>
               <div className="metric-card-bottom">
-                <div className="metric-value">{dataLoading ? '—' : fmtKg(dashData?.inventory?.total_stock_kg)}</div>
-                <div className="metric-trend positive">
-                  {dataLoading ? '' : `${dashData?.inventory?.total_products ?? 0} active products`}
+                <div className="metric-value">{dataLoading ? '—' : fmtKg(stockSummary.reduce((s, p) => s + p.available, 0))}</div>
+                <div className="metric-trend positive" style={{ fontSize: 11 }}>
+                  {dataLoading ? '' : (() => {
+                    const res = stockSummary.reduce((s,p) => s+p.reserved, 0);
+                    const dis = stockSummary.reduce((s,p) => s+p.dispatched, 0);
+                    const exp = stockSummary.reduce((s,p) => s+p.expected, 0);
+                    return `${fmtKg(res)} reserved · ${fmtKg(dis)} dispatched · ${fmtKg(exp)} incoming`;
+                  })()}
                 </div>
               </div>
             </article>

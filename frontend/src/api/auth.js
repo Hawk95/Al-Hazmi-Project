@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8003/api',
+  baseURL: import.meta.env.VITE_API_URL || `http://${window.location.hostname}:8003/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -30,11 +30,35 @@ api.interceptors.response.use(
 export async function login(credentials) {
   const response = await api.post('/auth/login', credentials);
   localStorage.setItem('erp_token', response.data.access_token);
+  try {
+    const perms = await api.get('/auth/me').then(r => r.data);
+    localStorage.setItem('erp_perms', JSON.stringify(perms));
+  } catch {}
   return response.data;
 }
 
 export function logout() {
   localStorage.removeItem('erp_token');
+  localStorage.removeItem('erp_perms');
+}
+
+export async function getMe() {
+  const r = await api.get('/auth/me');
+  localStorage.setItem('erp_perms', JSON.stringify(r.data));
+  return r.data;
+}
+
+export function hasHRAccess() {
+  try {
+    const raw = localStorage.getItem('erp_perms');
+    if (!raw) {
+      // Perms not cached yet — refresh in background, show link optimistically
+      getMe().catch(() => {});
+      return true;
+    }
+    const p = JSON.parse(raw);
+    return !!(p.is_admin || p.hr_access);
+  } catch { return true; }
 }
 
 export function isAuthenticated() {

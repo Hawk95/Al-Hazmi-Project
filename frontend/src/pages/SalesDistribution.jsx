@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users,
   Search, Plus, X, Pencil, Trash2, RefreshCw, TrendingUp, CheckCircle2,
-  XCircle, Phone, Mail, ArrowRight,
+  XCircle, Phone, Mail, ArrowRight, Zap,
 } from 'lucide-react';
-import { getCurrentUser } from '../api/auth';
+import { getCurrentUser, hasHRAccess } from '../api/auth';
 import {
   getSalesSummary, getSalesmen, createSalesman, updateSalesman, deleteSalesman,
   getDistributions, createDistribution, updateDistribution, deleteDistribution,
@@ -233,6 +233,9 @@ export default function SalesDistribution() {
           {sidebarBtn('/sales', <TrendingUp size={15} strokeWidth={1.5} />, 'Sales Distribution', true)}
           <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>Analytics</div>
           {sidebarBtn('/reports', <BarChart2 size={15} strokeWidth={1.5} />, 'Reports')}
+          {sidebarBtn('/forecast', <Zap size={15} strokeWidth={1.5} />, 'AI Forecast')}
+          {hasHRAccess() && <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>People</div>}
+          {hasHRAccess() && sidebarBtn('/hr', <UserCheck size={15} strokeWidth={1.5} />, 'HR Attendance')}
           <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>Admin</div>
           {sidebarBtn('/admin/users', <Users size={15} strokeWidth={1.5} />, 'User Management')}
         </nav>

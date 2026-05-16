@@ -33,6 +33,7 @@ class UserAdminView(BaseModel):
     phone: str | None = None
     is_active: bool
     is_admin: bool
+    hr_access: bool = False
     created_at: str | None = None
     last_login: str | None = None
 

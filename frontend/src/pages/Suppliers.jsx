@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users,
   Search, Plus, X, Pencil, Trash2, RefreshCw, Phone, Mail, MapPinned,
-  CheckCircle2, XCircle, ShieldCheck, LayoutGrid, List, Building2, TrendingUp
+  CheckCircle2, XCircle, ShieldCheck, LayoutGrid, List, Building2, TrendingUp, Zap, UserCheck
 } from 'lucide-react';
-import { getCurrentUser } from '../api/auth';
+import { getCurrentUser, hasHRAccess } from '../api/auth';
 import { getSuppliers, createSupplier, updateSupplier, deleteSupplier } from '../api/erp';
 
 const EMPTY = { name: '', contact_person: '', phone: '', email: '', address: '', is_active: true };
@@ -210,6 +210,9 @@ export default function Suppliers() {
           <button className="sidebar-item" type="button" onClick={() => navigate('/sales')}><TrendingUp size={15} strokeWidth={1.5} />Sales Distribution</button>
           <span className="sidebar-group-label">Analytics</span>
           <button className="sidebar-item" type="button" onClick={() => navigate('/reports')}><BarChart2 size={15} strokeWidth={1.5} />Reports</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/forecast')}><Zap size={15} strokeWidth={1.5} />AI Forecast</button>
+          {hasHRAccess() && <span className="sidebar-group-label">People</span>}
+          {hasHRAccess() && <button className="sidebar-item" type="button" onClick={() => navigate('/hr')}><UserCheck size={15} strokeWidth={1.5} />HR Attendance</button>}
           <span className="sidebar-group-label">Admin</span>
           <button className="sidebar-item" type="button" onClick={() => navigate('/admin/users')}><Users size={15} strokeWidth={1.5} />User Management</button>
         </nav>
