@@ -105,6 +105,17 @@ export const rejectSO              = (id, data) => api.put(`/stock/sale-orders/$
 export const getReturns            = ()         => api.get('/stock/returns').then(r => r.data);
 export const confirmReturn         = (id)       => api.put(`/stock/returns/${id}/confirm`).then(r => r.data);
 export const getInvoices           = ()         => api.get('/stock/invoices').then(r => r.data);
+export const getInvoiceSummary     = ()         => api.get('/stock/invoices/summary').then(r => r.data);
+export const getInvoiceDetail      = (id)       => api.get(`/stock/invoices/${id}`).then(r => r.data);
+export const updateInvoice         = (id, data) => api.put(`/stock/invoices/${id}`, data).then(r => r.data);
+export const payInvoice            = (id, data) => api.put(`/stock/invoices/${id}/pay`, data).then(r => r.data);
+
+// Accounts Payable (Bills)
+export const getBillSummary        = ()         => api.get('/stock/bills/summary').then(r => r.data);
+export const getBills              = ()         => api.get('/stock/bills').then(r => r.data);
+export const getBillDetail         = (id)       => api.get(`/stock/bills/${id}`).then(r => r.data);
+export const updateBill            = (id, data) => api.put(`/stock/bills/${id}`, data).then(r => r.data);
+export const payBill               = (id, data) => api.put(`/stock/bills/${id}/pay`, data).then(r => r.data);
 
 // Reports
 export const getReportSummary    = () => api.get('/reports/summary').then(r => r.data);

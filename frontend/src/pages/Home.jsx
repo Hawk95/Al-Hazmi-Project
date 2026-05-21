@@ -21,7 +21,7 @@ Chart.defaults.scale.border.display = false;
 
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2,
-  DollarSign, AlertTriangle, Clock, Plus, UserPlus, FileText, List,
+  DollarSign, AlertTriangle, Clock, Plus, UserPlus, FileText, List, Receipt,
   Search, Bell, Users, RefreshCw, TrendingUp, Zap, UserCheck, ClipboardList, FileCheck,
 } from 'lucide-react';
 import { logout, getCurrentUser, hasHRAccess } from '../api/auth';
@@ -299,6 +299,8 @@ const Home = () => {
           <button className="sidebar-item" type="button" onClick={() => navigate('/inventory')}><Package size={15} strokeWidth={1.5} />Inventory</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/purchase-orders')}><ClipboardList size={15} strokeWidth={1.5} />Purchase Orders</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/sale-orders')}><FileCheck size={15} strokeWidth={1.5} />Sale Orders</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/invoices')}><FileText size={15} strokeWidth={1.5} />Invoices (AR)</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/accounts-payable')}><Receipt size={15} strokeWidth={1.5} />Accounts Payable</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/orders')}><ShoppingCart size={15} strokeWidth={1.5} />Orders</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/suppliers')}><Truck size={15} strokeWidth={1.5} />Suppliers</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/deliveries')}><MapPin size={15} strokeWidth={1.5} />Deliveries</button>

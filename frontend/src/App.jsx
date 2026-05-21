@@ -17,6 +17,8 @@ import HR from './pages/HR';
 import EmployeePortal from './pages/EmployeePortal';
 import PurchaseOrders from './pages/PurchaseOrders';
 import SaleOrders from './pages/SaleOrders';
+import Invoices from './pages/Invoices';
+import AccountsPayable from './pages/AccountsPayable';
 import { isAuthenticated } from './api/auth';
 
 class ErrorBoundary extends Component {
@@ -79,6 +81,8 @@ function App() {
           <Route path="/forecast"          element={<P><Forecast /></P>} />
           <Route path="/purchase-orders"   element={<P><PurchaseOrders /></P>} />
           <Route path="/sale-orders"       element={<P><SaleOrders /></P>} />
+          <Route path="/invoices"          element={<P><Invoices /></P>} />
+          <Route path="/accounts-payable"  element={<P><AccountsPayable /></P>} />
           <Route path="/portal"            element={<EmployeePortal />} />
           <Route path="/" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />
           <Route path="/*" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />

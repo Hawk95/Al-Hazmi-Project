@@ -119,8 +119,8 @@ class PortalLoginRequest(BaseModel):
     pin: str
 
 class PortalCheckRequest(BaseModel):
-    lat: float
-    lng: float
+    lat: Optional[float] = None
+    lng: Optional[float] = None
     force: bool = False
 
 class AttendanceRecord(BaseModel):
@@ -413,12 +413,15 @@ def portal_status(emp_id: int = Depends(require_employee_token), db=Depends(get_
 
 @router.post('/portal/checkin')
 def portal_checkin(payload: PortalCheckRequest, emp_id: int = Depends(require_employee_token), db=Depends(get_db)):
-    dist = _haversine(payload.lat, payload.lng, OFFICE_LAT, OFFICE_LNG)
-    if dist > GEOFENCE_M and not payload.force:
-        raise HTTPException(
-            status_code=400,
-            detail=f'outside_geofence:{dist:.0f}',
-        )
+    has_gps = payload.lat is not None and payload.lng is not None
+    if has_gps:
+        dist   = _haversine(payload.lat, payload.lng, OFFICE_LAT, OFFICE_LNG)
+        method = 'gps'
+        if dist > GEOFENCE_M and not payload.force:
+            raise HTTPException(status_code=400, detail=f'outside_geofence:{dist:.0f}')
+    else:
+        dist   = 0
+        method = 'manual'
     now     = _uae_now()
     today   = now.strftime('%Y-%m-%d')
     now_t   = now.strftime('%H:%M')
@@ -428,13 +431,13 @@ def portal_checkin(payload: PortalCheckRequest, emp_id: int = Depends(require_em
     if not emp:
         raise HTTPException(status_code=404, detail='Employee not found')
     name, shift_start = emp
-    shift_str = str(shift_start)[:5] if shift_start else '09:00'
+    shift_str  = str(shift_start)[:5] if shift_start else '09:00'
     att_status = 'late' if now_t > shift_str else 'present'
     cur.execute('''
         INSERT INTO erp.attendance
             (employee_id, employee_name, attendance_date, status, check_in,
              check_in_method, check_in_lat, check_in_lng)
-        VALUES (%s,%s,%s,%s,%s,'gps',%s,%s)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
         ON CONFLICT (employee_id, attendance_date) DO UPDATE SET
             status          = EXCLUDED.status,
             check_in        = EXCLUDED.check_in,
@@ -443,17 +446,20 @@ def portal_checkin(payload: PortalCheckRequest, emp_id: int = Depends(require_em
             check_in_lng    = EXCLUDED.check_in_lng,
             employee_name   = EXCLUDED.employee_name
         WHERE erp.attendance.check_in IS NULL
-    ''', (emp_id, name, today, att_status, now_t, payload.lat, payload.lng))
-    return {'status': att_status, 'check_in': now_t, 'distance_m': round(dist, 1)}
+    ''', (emp_id, name, today, att_status, now_t, method, payload.lat, payload.lng))
+    return {'status': att_status, 'check_in': now_t, 'distance_m': round(dist, 1), 'method': method}
 
 @router.post('/portal/checkout')
 def portal_checkout(payload: PortalCheckRequest, emp_id: int = Depends(require_employee_token), db=Depends(get_db)):
-    dist = _haversine(payload.lat, payload.lng, OFFICE_LAT, OFFICE_LNG)
-    if dist > GEOFENCE_M and not payload.force:
-        raise HTTPException(
-            status_code=400,
-            detail=f'outside_geofence:{dist:.0f}',
-        )
+    has_gps = payload.lat is not None and payload.lng is not None
+    if has_gps:
+        dist   = _haversine(payload.lat, payload.lng, OFFICE_LAT, OFFICE_LNG)
+        method = 'gps'
+        if dist > GEOFENCE_M and not payload.force:
+            raise HTTPException(status_code=400, detail=f'outside_geofence:{dist:.0f}')
+    else:
+        dist   = 0
+        method = 'manual'
     now   = _uae_now()
     today = now.strftime('%Y-%m-%d')
     now_t = now.strftime('%H:%M')
@@ -466,10 +472,10 @@ def portal_checkout(payload: PortalCheckRequest, emp_id: int = Depends(require_e
         raise HTTPException(status_code=400, detail='You must check in before checking out.')
     cur.execute('''
         UPDATE erp.attendance
-        SET check_out=%s, check_out_method='gps', check_out_lat=%s, check_out_lng=%s
+        SET check_out=%s, check_out_method=%s, check_out_lat=%s, check_out_lng=%s
         WHERE employee_id=%s AND attendance_date=%s AND check_out IS NULL
-    ''', (now_t, payload.lat, payload.lng, emp_id, today))
-    return {'check_out': now_t, 'distance_m': round(dist, 1)}
+    ''', (now_t, method, payload.lat, payload.lng, emp_id, today))
+    return {'check_out': now_t, 'distance_m': round(dist, 1), 'method': method}
 
 
 @router.get('/summary')

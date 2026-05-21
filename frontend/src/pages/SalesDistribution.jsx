@@ -54,7 +54,7 @@ export default function SalesDistribution() {
   const [distributions, setDistributions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [dateFilter, setDateFilter] = useState(today());
+  const [dateFilter, setDateFilter] = useState('');
   const [emirateFilter, setEmirateFilter] = useState('');
   const [salesmanFilter, setSalesmanFilter] = useState('');
   const [search, setSearch] = useState('');
@@ -398,8 +398,8 @@ export default function SalesDistribution() {
                 <Search size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#4b5563' }} />
                 <input placeholder="Search…" value={search} onChange={e => setSearch(e.target.value)} style={{ ...S.input, paddingLeft: 30 }} />
               </div>
-              <button type="button" onClick={() => { setDateFilter(today()); setEmirateFilter(''); setSalesmanFilter(''); setSearch(''); }}
-                style={{ padding: '9px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280', fontSize: 12, cursor: 'pointer' }}>Reset</button>
+              <button type="button" onClick={() => { setDateFilter(''); setEmirateFilter(''); setSalesmanFilter(''); setSearch(''); }}
+                style={{ padding: '9px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280', fontSize: 12, cursor: 'pointer' }}>Reset Filters</button>
             </div>
 
             {/* Inline totals bar */}

@@ -5,6 +5,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users,
   TrendingUp, AlertTriangle, CheckCircle2, RefreshCw, Zap, UserCheck,
   ArrowUp, ArrowDown, Minus, Clock, Target, Activity,
+  ClipboardList, FileCheck, FileText, Receipt,
 } from 'lucide-react';
 import { getCurrentUser, hasHRAccess } from '../api/auth';
 import { getProducts, getDistributions } from '../api/erp';
@@ -421,6 +422,10 @@ export default function Forecast() {
           <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px' }}>Main</div>
           {sidebarBtn('/dashboard', <LayoutDashboard size={15} strokeWidth={1.5} />, 'Overview')}
           {sidebarBtn('/inventory', <Package size={15} strokeWidth={1.5} />, 'Inventory')}
+          {sidebarBtn('/purchase-orders', <ClipboardList size={15} strokeWidth={1.5} />, 'Purchase Orders')}
+          {sidebarBtn('/sale-orders', <FileCheck size={15} strokeWidth={1.5} />, 'Sale Orders')}
+          {sidebarBtn('/invoices', <FileText size={15} strokeWidth={1.5} />, 'Invoices (AR)')}
+          {sidebarBtn('/accounts-payable', <Receipt size={15} strokeWidth={1.5} />, 'Accounts Payable')}
           {sidebarBtn('/orders', <ShoppingCart size={15} strokeWidth={1.5} />, 'Orders')}
           {sidebarBtn('/suppliers', <Truck size={15} strokeWidth={1.5} />, 'Suppliers')}
           {sidebarBtn('/deliveries', <MapPin size={15} strokeWidth={1.5} />, 'Deliveries')}

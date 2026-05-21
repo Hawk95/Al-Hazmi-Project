@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users,
   Search, Plus, X, Pencil, Trash2, AlertTriangle, TrendingUp, TrendingDown,
-  RefreshCw, ArrowUpDown, CheckCircle2, XCircle, Filter, Zap, UserCheck
+  RefreshCw, ArrowUpDown, CheckCircle2, XCircle, Filter, Zap, UserCheck,
+  ClipboardList, FileCheck, FileText, Receipt
 } from 'lucide-react';
 import { getCurrentUser, hasHRAccess } from '../api/auth';
 import { getProducts, createProduct, updateProduct, adjustStock, deleteProduct } from '../api/erp';
@@ -215,6 +216,10 @@ export default function Inventory() {
           <span className="sidebar-group-label">Main</span>
           <button className="sidebar-item" type="button" onClick={() => navigate('/dashboard')}><LayoutDashboard size={15} strokeWidth={1.5} />Overview</button>
           <button className="sidebar-item active" type="button"><Package size={15} strokeWidth={1.5} />Inventory</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/purchase-orders')}><ClipboardList size={15} strokeWidth={1.5} />Purchase Orders</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/sale-orders')}><FileCheck size={15} strokeWidth={1.5} />Sale Orders</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/invoices')}><FileText size={15} strokeWidth={1.5} />Invoices (AR)</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/accounts-payable')}><Receipt size={15} strokeWidth={1.5} />Accounts Payable</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/orders')}><ShoppingCart size={15} strokeWidth={1.5} />Orders</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/suppliers')}><Truck size={15} strokeWidth={1.5} />Suppliers</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/deliveries')}><MapPin size={15} strokeWidth={1.5} />Deliveries</button>

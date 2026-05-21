@@ -211,7 +211,7 @@ export default function HR({ isModal = false, onClose = null }) {
       </aside>
 
       {/* ── Main ── */}
-      <main className="dashboard-content page-enter" style={{ paddingTop: 0, ...(isModal ? { flex: 1, minWidth: 0, overflowY: 'auto', overflowX: 'hidden' } : {}) }}>
+      <main className="dashboard-content page-enter" style={{ paddingTop: 0, ...(isModal ? { flex: 1, minWidth: 0, overflowY: 'auto', overflowX: 'hidden', marginLeft: 0, marginTop: 0 } : {}) }}>
 
         {/* Header */}
         <div className="um2-page-header">

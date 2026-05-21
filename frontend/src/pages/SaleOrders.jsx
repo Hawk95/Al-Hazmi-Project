@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2,
   TrendingUp, Zap, UserCheck, Users, Plus, X, RefreshCw, CheckCircle2,
-  AlertCircle, ClipboardList, FileCheck, Search, ArrowRight,
-  RotateCcw, Send, PackageCheck, Clock, ChevronRight,
+  AlertCircle, ClipboardList, FileCheck, FileText, Search, ArrowRight,
+  RotateCcw, Send, PackageCheck, Clock, ChevronRight, Receipt,
 } from 'lucide-react';
 import { getCurrentUser } from '../api/auth';
 import {
@@ -229,6 +229,8 @@ export default function SaleOrders() {
           {nb('/inventory',       <Package         size={15} />, 'Inventory',          false)}
           {nb('/purchase-orders', <ClipboardList   size={15} />, 'Purchase Orders',    false)}
           {nb('/sale-orders',     <FileCheck       size={15} />, 'Sale Orders',        true)}
+          {nb('/invoices',        <FileText        size={15} />, 'Invoices (AR)',        false)}
+          {nb('/accounts-payable',<Receipt         size={15} />, 'Accounts Payable',    false)}
           {nb('/orders',          <ShoppingCart    size={15} />, 'Orders',             false)}
           {nb('/suppliers',       <Truck           size={15} />, 'Suppliers',          false)}
           {nb('/deliveries',      <MapPin          size={15} />, 'Deliveries',         false)}

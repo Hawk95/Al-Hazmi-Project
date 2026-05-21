@@ -71,7 +71,11 @@ export default function EmployeePortal() {
         setGpsLoading(false);
       },
       err => {
-        const msgs = { 1: 'Location access denied. Allow location in browser settings.', 2: 'Location unavailable.', 3: 'Location timed out.' };
+        const msgs = {
+          1: 'Location permission denied. Tap the 🔒 icon in your browser address bar → Site settings → Location → Allow, then refresh.',
+          2: 'Location signal unavailable. Make sure device location/GPS is turned on.',
+          3: 'Location timed out. Move closer to a window and try again.',
+        };
         setGps({ error: msgs[err.code] || 'GPS error.' });
         setGpsLoading(false);
       },
@@ -123,10 +127,10 @@ export default function EmployeePortal() {
   };
 
   const handleAction = async (force = false) => {
-    if (!gps || gps.error) { setActionErr('GPS location required. Enable location access.'); return; }
+    const noGps = !gps || !!gps.error;
 
     // If outside geofence and not forced, show confirmation instead
-    if (gps.dist > GEOFENCE_M && !force) {
+    if (!noGps && gps.dist > GEOFENCE_M && !force) {
       setConfirmOutside(true);
       return;
     }
@@ -134,13 +138,19 @@ export default function EmployeePortal() {
     setConfirmOutside(false);
     setActionLoading(true); setActionErr(''); setActionMsg('');
     try {
-      const body = { lat: gps.lat, lng: gps.lng, force };
+      // Send null coords when GPS is unavailable — backend marks as 'manual'
+      const body = noGps
+        ? { lat: null, lng: null, force: true }
+        : { lat: gps.lat, lng: gps.lng, force };
+
       if (!attStatus?.check_in) {
         const res = await portalCheckIn(body);
-        setActionMsg(`Checked in at ${res.check_in} — ${res.status === 'late' ? 'Late' : 'On time'}${force ? ' (remote)' : ''}`);
+        const tag = noGps ? ' (no GPS)' : force ? ' (remote)' : '';
+        setActionMsg(`Checked in at ${res.check_in} — ${res.status === 'late' ? 'Late' : 'On time'}${tag}`);
       } else if (!attStatus?.check_out) {
         const res = await portalCheckOut(body);
-        setActionMsg(`Checked out at ${res.check_out}${force ? ' (remote)' : ''}`);
+        const tag = noGps ? ' (no GPS)' : force ? ' (remote)' : '';
+        setActionMsg(`Checked out at ${res.check_out}${tag}`);
       }
       const updated = await portalGetStatus();
       setAttStatus(updated);
@@ -158,6 +168,7 @@ export default function EmployeePortal() {
   };
 
   const inRange    = gps && !gps.error && gps.dist <= GEOFENCE_M;
+  const noGps      = !gps || !!gps.error;
   const checkedIn  = !!attStatus?.check_in;
   const checkedOut = !!attStatus?.check_out;
   const actionDone = checkedIn && checkedOut;
@@ -171,20 +182,21 @@ export default function EmployeePortal() {
   // ── GPS indicator config
   const gpsState = gps?.error ? 'error' : gpsLoading ? 'loading' : !gps ? 'waiting' : inRange ? 'in' : 'out';
   const gpsCfg = {
-    error:   { icon: '🚫', color: '#ef4444', border: 'rgba(239,68,68,0.3)',   bg: 'rgba(239,68,68,0.07)'   },
-    loading: { icon: '⏳', color: '#9ca3af', border: 'rgba(255,255,255,0.1)', bg: 'rgba(255,255,255,0.03)' },
-    waiting: { icon: '📍', color: '#6b7280', border: 'rgba(255,255,255,0.08)', bg: 'rgba(255,255,255,0.02)' },
-    in:      { icon: '✅', color: '#10b981', border: 'rgba(16,185,129,0.35)',  bg: 'rgba(16,185,129,0.07)'  },
-    out:     { icon: '⚠️', color: '#f59e0b', border: 'rgba(245,158,11,0.35)', bg: 'rgba(245,158,11,0.07)'  },
+    error:   { icon: '📵', color: '#f59e0b', border: 'rgba(245,158,11,0.3)',  bg: 'rgba(245,158,11,0.07)',  note: 'GPS unavailable — attendance will be marked manually' },
+    loading: { icon: '⏳', color: '#9ca3af', border: 'rgba(255,255,255,0.1)', bg: 'rgba(255,255,255,0.03)', note: null },
+    waiting: { icon: '📍', color: '#6b7280', border: 'rgba(255,255,255,0.08)', bg: 'rgba(255,255,255,0.02)', note: null },
+    in:      { icon: '✅', color: '#10b981', border: 'rgba(16,185,129,0.35)',  bg: 'rgba(16,185,129,0.07)',  note: null },
+    out:     { icon: '⚠️', color: '#f59e0b', border: 'rgba(245,158,11,0.35)', bg: 'rgba(245,158,11,0.07)',  note: null },
   }[gpsState];
 
-  // ── Action button config
-  const btnDisabled = actionLoading || !gps || !!gps?.error;
-  const btnLabel    = actionLoading ? 'Processing…' : checkedIn ? 'CHECK OUT' : 'CHECK IN';
+  // ── Action button config — never disabled just because GPS is missing
+  const btnDisabled = actionLoading;
+  const baseLabel   = checkedIn ? 'CHECK OUT' : 'CHECK IN';
+  const btnLabel    = actionLoading ? 'Processing…' : noGps ? `${baseLabel} (NO GPS)` : baseLabel;
   const btnColor    = checkedIn
-    ? (btnDisabled ? 'rgba(245,158,11,0.2)' : inRange ? 'linear-gradient(135deg,#f59e0b,#d97706)' : 'linear-gradient(135deg,#f97316,#ea580c)')
-    : (btnDisabled ? 'rgba(59,130,246,0.2)'  : inRange ? 'linear-gradient(135deg,#3b82f6,#2563eb)' : 'linear-gradient(135deg,#6366f1,#4f46e5)');
-  const btnShadow = !btnDisabled ? (checkedIn ? '0 6px 24px rgba(245,158,11,0.4)' : '0 6px 24px rgba(59,130,246,0.4)') : 'none';
+    ? (inRange || noGps ? 'linear-gradient(135deg,#f59e0b,#d97706)' : 'linear-gradient(135deg,#f97316,#ea580c)')
+    : (inRange || noGps ? 'linear-gradient(135deg,#3b82f6,#2563eb)' : 'linear-gradient(135deg,#6366f1,#4f46e5)');
+  const btnShadow = checkedIn ? '0 6px 24px rgba(245,158,11,0.4)' : '0 6px 24px rgba(59,130,246,0.4)';
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#0b0b14 0%,#11111c 60%,#141420 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 16px', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -323,7 +335,12 @@ export default function EmployeePortal() {
             <div style={{ fontSize: 22, flexShrink: 0, lineHeight: 1 }}>{gpsCfg.icon}</div>
             <div style={{ flex: 1 }}>
               {gpsLoading && <div style={{ fontSize: 13, color: '#9ca3af' }}>Getting your location…</div>}
-              {gps?.error && <div style={{ fontSize: 13, color: '#f87171', fontWeight: 600 }}>{gps.error}</div>}
+              {gps?.error && (
+                <>
+                  <div style={{ fontSize: 13, color: '#fbbf24', fontWeight: 700 }}>Location not available</div>
+                  <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 3, lineHeight: 1.5 }}>{gps.error}</div>
+                </>
+              )}
               {gps && !gps.error && (
                 <>
                   <div style={{ fontSize: 13, fontWeight: 700, color: gpsCfg.color }}>
@@ -338,6 +355,14 @@ export default function EmployeePortal() {
               {!gps && !gpsLoading && <div style={{ fontSize: 13, color: '#4b5563' }}>Waiting for GPS signal…</div>}
             </div>
           </div>
+
+          {/* Retry location button */}
+          {gps?.error && (
+            <button type="button" onClick={() => { setGps(null); stopGpsWatch(); setTimeout(startGpsWatch, 100); }}
+              style={{ width: '100%', padding: '12px 0', borderRadius: 12, marginBottom: 14, background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)', color: '#fbbf24', fontSize: 13, fontWeight: 700, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
+              🔄 Retry Location
+            </button>
+          )}
 
           {/* Outside-geofence confirmation card */}
           {confirmOutside && gps && !gps.error && (
@@ -390,9 +415,14 @@ export default function EmployeePortal() {
                 opacity: btnDisabled ? 0.5 : 1,
               }}>
               {btnLabel}
-              {!btnDisabled && !inRange && !actionLoading && (
+              {!actionLoading && !inRange && !noGps && (
                 <div style={{ fontSize: 11, fontWeight: 500, marginTop: 4, opacity: 0.8, letterSpacing: 0.3 }}>
                   {gps?.dist}m away — tap to confirm
+                </div>
+              )}
+              {!actionLoading && noGps && (
+                <div style={{ fontSize: 11, fontWeight: 500, marginTop: 4, opacity: 0.8, letterSpacing: 0.3 }}>
+                  Manual — admin will verify
                 </div>
               )}
             </button>
