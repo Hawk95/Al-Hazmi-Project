@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     backend_host: str = '127.0.0.1'
     backend_port: int = 8002
     cors_allowed_origins: str = 'http://localhost:5173,http://localhost:5174'
+    db_sslmode: str = 'prefer'
 
     @property
     def db_conninfo(self) -> str:
@@ -22,7 +23,8 @@ class Settings(BaseSettings):
         return (
             f"host={p.hostname} port={p.port or 5432} "
             f"dbname={p.path.lstrip('/')} "
-            f"user={p.username} password={unquote(p.password or '')}"
+            f"user={p.username} password={unquote(p.password or '')} "
+            f"sslmode={self.db_sslmode}"
         )
 
     class Config:
