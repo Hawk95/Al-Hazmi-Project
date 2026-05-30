@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.routes import auth, admin, suppliers, products, orders, deliveries, reports, sales, hr, stock, customers, pnl, vat
 from app.core.config import settings
@@ -15,6 +16,19 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+@app.get('/health')
+def health():
+    try:
+        import psycopg
+        conn = psycopg.connect(settings.db_conninfo, connect_timeout=5)
+        cur = conn.cursor()
+        cur.execute('SELECT COUNT(*) FROM erp.users')
+        count = cur.fetchone()[0]
+        conn.close()
+        return {'status': 'ok', 'db': 'connected', 'users': count}
+    except Exception as e:
+        return JSONResponse(status_code=503, content={'status': 'error', 'db': str(e)})
 
 app.include_router(auth.router,        prefix='/api/auth',       tags=['auth'])
 app.include_router(admin.router,       prefix='/api/admin',      tags=['admin'])
