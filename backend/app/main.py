@@ -19,19 +19,27 @@ app.add_middleware(
 
 @app.get('/health')
 def health():
+    import os, psycopg
+    env_check = {
+        'DB_URL_set':        bool(os.environ.get('DB_URL')),
+        'DATABASE_URL_set':  bool(os.environ.get('DATABASE_URL')),
+        'DB_SSLMODE_set':    bool(os.environ.get('DB_SSLMODE')),
+        'SECRET_KEY_set':    bool(os.environ.get('SECRET_KEY')),
+    }
     try:
-        import psycopg
         conn = psycopg.connect(settings.db_conninfo, connect_timeout=10)
         cur = conn.cursor()
         cur.execute('SELECT COUNT(*) FROM erp.users')
         count = cur.fetchone()[0]
         conn.close()
-        return {'status': 'ok', 'db': 'connected', 'db_host': settings.db_host, 'users': count}
+        return {'status': 'ok', 'db': 'connected', 'db_host': settings.db_host,
+                'users': count, 'env': env_check}
     except Exception as e:
         return JSONResponse(status_code=503, content={
             'status': 'error',
             'db_host': settings.db_host,
             'error': str(e),
+            'env': env_check,
         })
 
 app.include_router(auth.router,        prefix='/api/auth',       tags=['auth'])
