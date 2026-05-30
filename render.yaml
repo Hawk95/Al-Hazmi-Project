@@ -8,3 +8,15 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
+      - key: DB_URL
+        value: postgresql+psycopg://postgres:Alhazmi2026@db.nigohtatadfiidmkixeh.supabase.co:5432/postgres
+      - key: DB_SSLMODE
+        value: require
+      - key: SECRET_KEY
+        value: 7825275d4a20798e5f0b24c859e867344e2801467d6c7e0ddd916eb97b478a04
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://al-hazmi-project.vercel.app
