@@ -21,14 +21,18 @@ app.add_middleware(
 def health():
     try:
         import psycopg
-        conn = psycopg.connect(settings.db_conninfo, connect_timeout=5)
+        conn = psycopg.connect(settings.db_conninfo, connect_timeout=10)
         cur = conn.cursor()
         cur.execute('SELECT COUNT(*) FROM erp.users')
         count = cur.fetchone()[0]
         conn.close()
-        return {'status': 'ok', 'db': 'connected', 'users': count}
+        return {'status': 'ok', 'db': 'connected', 'db_host': settings.db_host, 'users': count}
     except Exception as e:
-        return JSONResponse(status_code=503, content={'status': 'error', 'db': str(e)})
+        return JSONResponse(status_code=503, content={
+            'status': 'error',
+            'db_host': settings.db_host,
+            'error': str(e),
+        })
 
 app.include_router(auth.router,        prefix='/api/auth',       tags=['auth'])
 app.include_router(admin.router,       prefix='/api/admin',      tags=['admin'])
