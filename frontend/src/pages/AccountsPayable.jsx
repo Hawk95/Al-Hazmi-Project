@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2,
   TrendingUp, Zap, UserCheck, Users, X, RefreshCw, CheckCircle2,
   AlertCircle, ClipboardList, FileCheck, Search, DollarSign,
-  Clock, Wallet, FileText, CreditCard, Receipt,
+  Clock, Wallet, FileText, CreditCard, Receipt, Activity,
 } from 'lucide-react';
 import { getCurrentUser } from '../api/auth';
 import { getBills, getBillSummary, getBillDetail, payBill, updateBill } from '../api/erp';
@@ -197,9 +197,12 @@ export default function AccountsPayable() {
           {nb('/sale-orders',     <ClipboardList size={16} />,   'Sale Orders',        false)}
           {nb('/invoices',        <FileCheck size={16} />,       'Invoices (AR)',      false)}
           {nb('/accounts-payable',<Receipt size={16} />,         'Accounts Payable',   true)}
+          {nb('/customers',       <Users size={16} />,          'Customers',           false)}
           {nb('/sales',           <TrendingUp size={16} />,      'Sales Distribution', false)}
           {nb('/deliveries',      <Truck size={16} />,           'Deliveries',         false)}
           {nb('/suppliers',       <Users size={16} />,           'Suppliers',          false)}
+          {nb('/vat-return',      <FileCheck size={16} />,       'VAT Return',         false)}
+          {nb('/pnl',             <Activity  size={16} />,       'Profit & Loss',      false)}
           {nb('/reports',         <BarChart2 size={16} />,       'Reports',            false)}
           {nb('/hr',              <UserCheck size={16} />,       'HR / Payroll',       false)}
         </div>

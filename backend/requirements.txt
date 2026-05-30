@@ -1,7 +1,23 @@
-fastapi==0.115.1
-uvicorn[standard]==0.24.0
-python-dotenv==1.0.1
-bcrypt==5.0.0
-PyJWT==2.9.0
+# Web framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+gunicorn==26.0.0
+
+# Database
 psycopg[binary]==3.3.3
+psycopg2-binary==2.9.12
+
+# Auth
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==5.0.0
+python-multipart==0.0.12
+
+# Config / validation
+pydantic==2.9.2
 pydantic-settings==2.5.2
+python-dotenv==1.0.1
+
+# Utilities
+pytz==2026.2
+tzdata==2026.2

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users, AlertTriangle, TrendingUp, DollarSign, RefreshCw, Zap, UserCheck, ClipboardList, FileCheck, FileText, Receipt } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users, AlertTriangle, TrendingUp, DollarSign, RefreshCw, Zap, UserCheck, ClipboardList, FileCheck, FileText, Receipt, Activity } from 'lucide-react';
 import { getCurrentUser, hasHRAccess } from '../api/auth';
 import { getReportSummary, getLowStockReport, getTopProducts, getOrdersByStatus } from '../api/erp';
 
@@ -49,11 +49,14 @@ export default function Reports() {
           <button className="sidebar-item" type="button" onClick={() => navigate('/sale-orders')}><FileCheck size={15} strokeWidth={1.5} />Sale Orders</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/invoices')}><FileText size={15} strokeWidth={1.5} />Invoices (AR)</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/accounts-payable')}><Receipt size={15} strokeWidth={1.5} />Accounts Payable</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/customers')}><Users size={15} strokeWidth={1.5} />Customers</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/orders')}><ShoppingCart size={15} strokeWidth={1.5} />Orders</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/suppliers')}><Truck size={15} strokeWidth={1.5} />Suppliers</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/deliveries')}><MapPin size={15} strokeWidth={1.5} />Deliveries</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/sales')}><TrendingUp size={15} strokeWidth={1.5} />Sales Distribution</button>
           <span className="sidebar-group-label">Analytics</span>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/vat-return')}><FileCheck size={15} strokeWidth={1.5} />VAT Return</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/pnl')}><Activity size={15} strokeWidth={1.5} />Profit &amp; Loss</button>
           <button className="sidebar-item active" type="button"><BarChart2 size={15} strokeWidth={1.5} />Reports</button>
           <button className="sidebar-item" type="button" onClick={() => navigate('/forecast')}><Zap size={15} strokeWidth={1.5} />AI Forecast</button>
           {hasHRAccess() && <span className="sidebar-group-label">People</span>}

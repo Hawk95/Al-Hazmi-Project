@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2,
   TrendingUp, Zap, UserCheck, Users, Plus, X, RefreshCw, CheckCircle2,
   AlertCircle, ClipboardList, FileCheck, FileText, Search, ChevronRight,
-  ArrowRight, Boxes, Clock, PackageCheck, Send, Receipt,
+  ArrowRight, Boxes, Clock, PackageCheck, Send, Receipt, Activity,
 } from 'lucide-react';
 import { getCurrentUser } from '../api/auth';
 import {
@@ -184,11 +184,14 @@ export default function PurchaseOrders() {
           {nb('/sale-orders',     <FileCheck       size={15}/>, 'Sale Orders',        false)}
           {nb('/invoices',        <FileText        size={15}/>, 'Invoices (AR)',        false)}
           {nb('/accounts-payable',<Receipt         size={15}/>, 'Accounts Payable',    false)}
+          {nb('/customers',       <Users           size={15}/>, 'Customers',            false)}
           {nb('/orders',          <ShoppingCart    size={15}/>, 'Orders',             false)}
           {nb('/suppliers',       <Truck           size={15}/>, 'Suppliers',          false)}
           {nb('/deliveries',      <MapPin          size={15}/>, 'Deliveries',         false)}
           {nb('/sales',           <TrendingUp      size={15}/>, 'Sales Distribution', false)}
           <div style={{ fontSize:9.5, fontWeight:700, color:'#64748b', letterSpacing:'0.14em', textTransform:'uppercase', padding:'14px 8px 5px' }}>Analytics</div>
+          {nb('/vat-return',      <FileCheck       size={15}/>, 'VAT Return',         false)}
+          {nb('/pnl',             <Activity        size={15}/>, 'Profit & Loss',      false)}
           {nb('/reports',         <BarChart2       size={15}/>, 'Reports',            false)}
           {nb('/forecast',        <Zap             size={15}/>, 'AI Forecast',        false)}
           <div style={{ fontSize:9.5, fontWeight:700, color:'#64748b', letterSpacing:'0.14em', textTransform:'uppercase', padding:'14px 8px 5px' }}>People</div>

@@ -426,11 +426,14 @@ export default function Forecast() {
           {sidebarBtn('/sale-orders', <FileCheck size={15} strokeWidth={1.5} />, 'Sale Orders')}
           {sidebarBtn('/invoices', <FileText size={15} strokeWidth={1.5} />, 'Invoices (AR)')}
           {sidebarBtn('/accounts-payable', <Receipt size={15} strokeWidth={1.5} />, 'Accounts Payable')}
+          {sidebarBtn('/customers', <Users size={15} strokeWidth={1.5} />, 'Customers')}
           {sidebarBtn('/orders', <ShoppingCart size={15} strokeWidth={1.5} />, 'Orders')}
           {sidebarBtn('/suppliers', <Truck size={15} strokeWidth={1.5} />, 'Suppliers')}
           {sidebarBtn('/deliveries', <MapPin size={15} strokeWidth={1.5} />, 'Deliveries')}
           {sidebarBtn('/sales', <TrendingUp size={15} strokeWidth={1.5} />, 'Sales Distribution')}
           <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>Analytics</div>
+          {sidebarBtn('/vat-return', <FileCheck size={15} strokeWidth={1.5} />, 'VAT Return')}
+          {sidebarBtn('/pnl', <Activity size={15} strokeWidth={1.5} />, 'Profit & Loss')}
           {sidebarBtn('/reports', <BarChart2 size={15} strokeWidth={1.5} />, 'Reports')}
           {sidebarBtn('/forecast', <Zap size={15} strokeWidth={1.5} />, 'AI Forecast', true)}
           {hasHRAccess() && <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>People</div>}

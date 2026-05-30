@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     db_url: str = 'postgresql+psycopg://erp_user:ErpUser%40123@127.0.0.1:5432/meat_erp'
     backend_host: str = '127.0.0.1'
     backend_port: int = 8002
+    cors_allowed_origins: str = 'http://localhost:5173,http://localhost:5174'
 
     @property
     def db_conninfo(self) -> str:

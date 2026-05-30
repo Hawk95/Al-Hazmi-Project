@@ -1,21 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import auth, admin, suppliers, products, orders, deliveries, reports, sales, hr, stock
+from app.routes import auth, admin, suppliers, products, orders, deliveries, reports, sales, hr, stock, customers, pnl, vat
 from app.core.config import settings
 
 app = FastAPI(title='Meat Distribution ERP')
 
+_origins = [o.strip() for o in settings.cors_allowed_origins.split(',') if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        'http://localhost:5173',
-        'http://127.0.0.1:5173',
-        'http://localhost:5174',
-        'http://127.0.0.1:5174',
-        'http://localhost:5175',
-        'http://127.0.0.1:5175',
-    ],
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
@@ -31,6 +26,9 @@ app.include_router(reports.router,     prefix='/api/reports',    tags=['reports'
 app.include_router(sales.router,       prefix='/api/sales',      tags=['sales'])
 app.include_router(hr.router,          prefix='/api/hr',         tags=['hr'])
 app.include_router(stock.router,       prefix='/api/stock',      tags=['stock'])
+app.include_router(customers.router,   prefix='/api',            tags=['customers'])
+app.include_router(pnl.router,         prefix='/api',            tags=['pnl'])
+app.include_router(vat.router,         prefix='/api',            tags=['vat'])
 
 
 if __name__ == '__main__':

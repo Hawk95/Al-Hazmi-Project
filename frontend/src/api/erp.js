@@ -110,6 +110,23 @@ export const getInvoiceDetail      = (id)       => api.get(`/stock/invoices/${id
 export const updateInvoice         = (id, data) => api.put(`/stock/invoices/${id}`, data).then(r => r.data);
 export const payInvoice            = (id, data) => api.put(`/stock/invoices/${id}/pay`, data).then(r => r.data);
 
+// VAT Return
+export const getVatReturn  = (year, quarter) => api.get('/vat/return', { params: { year, quarter } }).then(r => r.data);
+export const getVatPeriods = ()              => api.get('/vat/periods').then(r => r.data);
+
+// Profit & Loss
+export const getPnlSummary = () => api.get('/pnl/summary').then(r => r.data);
+export const getPnlSales   = () => api.get('/pnl/sales').then(r => r.data);
+export const getPnlWeekly  = () => api.get('/pnl/weekly').then(r => r.data);
+
+// Customers
+export const getCustomers       = ()         => api.get('/customers').then(r => r.data);
+export const getCustomerSummary = ()         => api.get('/customers/summary').then(r => r.data);
+export const getCustomerDetail  = (id)       => api.get(`/customers/${id}`).then(r => r.data);
+export const createCustomer     = (data)     => api.post('/customers', data).then(r => r.data);
+export const updateCustomer     = (id, data) => api.put(`/customers/${id}`, data).then(r => r.data);
+export const deleteCustomer     = (id)       => api.delete(`/customers/${id}`);
+
 // Accounts Payable (Bills)
 export const getBillSummary        = ()         => api.get('/stock/bills/summary').then(r => r.data);
 export const getBills              = ()         => api.get('/stock/bills').then(r => r.data);

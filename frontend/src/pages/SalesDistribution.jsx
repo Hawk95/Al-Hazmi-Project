@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2, Users,
   Search, Plus, X, Pencil, Trash2, RefreshCw, TrendingUp, CheckCircle2,
-  XCircle, Phone, Mail, ArrowRight, Zap,
+  XCircle, Phone, Mail, ArrowRight, Zap, UserCheck, ClipboardList,
+  FileCheck, FileText, Receipt, Activity,
 } from 'lucide-react';
 import { getCurrentUser, hasHRAccess } from '../api/auth';
 import {
@@ -224,20 +225,24 @@ export default function SalesDistribution() {
           <div><div style={{ fontSize: 13, fontWeight: 700, color: '#f2f2f7' }}>Al Hazmi</div><div style={{ fontSize: 10, color: '#4b5563' }}>Meat ERP</div></div>
         </div>
         <nav style={{ flex: 1, padding: '12px 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px' }}>Main</div>
-          {sidebarBtn('/dashboard', <LayoutDashboard size={15} strokeWidth={1.5} />, 'Overview')}
-          {sidebarBtn('/inventory', <Package size={15} strokeWidth={1.5} />, 'Inventory')}
-          {sidebarBtn('/orders', <ShoppingCart size={15} strokeWidth={1.5} />, 'Orders')}
-          {sidebarBtn('/suppliers', <Truck size={15} strokeWidth={1.5} />, 'Suppliers')}
-          {sidebarBtn('/deliveries', <MapPin size={15} strokeWidth={1.5} />, 'Deliveries')}
-          {sidebarBtn('/sales', <TrendingUp size={15} strokeWidth={1.5} />, 'Sales Distribution', true)}
+          {sidebarBtn('/dashboard',        <LayoutDashboard size={15} strokeWidth={1.5} />, 'Dashboard')}
+          {sidebarBtn('/inventory',        <Package         size={15} strokeWidth={1.5} />, 'Inventory')}
+          {sidebarBtn('/purchase-orders',  <ClipboardList   size={15} strokeWidth={1.5} />, 'Purchase Orders')}
+          {sidebarBtn('/sale-orders',      <ClipboardList   size={15} strokeWidth={1.5} />, 'Sale Orders')}
+          {sidebarBtn('/invoices',         <FileText        size={15} strokeWidth={1.5} />, 'Invoices (AR)')}
+          {sidebarBtn('/accounts-payable', <Receipt         size={15} strokeWidth={1.5} />, 'Accounts Payable')}
+          {sidebarBtn('/customers',        <Users           size={15} strokeWidth={1.5} />, 'Customers')}
+          {sidebarBtn('/orders',           <ShoppingCart    size={15} strokeWidth={1.5} />, 'Orders')}
+          {sidebarBtn('/suppliers',        <Truck           size={15} strokeWidth={1.5} />, 'Suppliers')}
+          {sidebarBtn('/deliveries',       <MapPin          size={15} strokeWidth={1.5} />, 'Deliveries')}
+          {sidebarBtn('/sales',            <TrendingUp      size={15} strokeWidth={1.5} />, 'Sales Distribution', true)}
           <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>Analytics</div>
-          {sidebarBtn('/reports', <BarChart2 size={15} strokeWidth={1.5} />, 'Reports')}
-          {sidebarBtn('/forecast', <Zap size={15} strokeWidth={1.5} />, 'AI Forecast')}
-          {hasHRAccess() && <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>People</div>}
-          {hasHRAccess() && sidebarBtn('/hr', <UserCheck size={15} strokeWidth={1.5} />, 'HR Attendance')}
-          <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>Admin</div>
-          {sidebarBtn('/admin/users', <Users size={15} strokeWidth={1.5} />, 'User Management')}
+          {sidebarBtn('/vat-return',       <FileCheck       size={15} strokeWidth={1.5} />, 'VAT Return')}
+          {sidebarBtn('/pnl',              <Activity        size={15} strokeWidth={1.5} />, 'Profit & Loss')}
+          {sidebarBtn('/reports',          <BarChart2       size={15} strokeWidth={1.5} />, 'Reports')}
+          {sidebarBtn('/forecast',         <Zap             size={15} strokeWidth={1.5} />, 'AI Forecast')}
+          <div style={{ fontSize: 10, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '6px 8px', marginTop: 8 }}>People</div>
+          {sidebarBtn('/hr',               <UserCheck       size={15} strokeWidth={1.5} />, 'HR / Payroll')}
         </nav>
         <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#3b82f6,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff', flexShrink: 0 }}>{initials}</div>
