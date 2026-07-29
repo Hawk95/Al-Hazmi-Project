@@ -1,5 +1,4 @@
 import os
-from urllib.parse import urlparse, unquote
 from pydantic_settings import BaseSettings
 
 
@@ -7,15 +6,17 @@ class Settings(BaseSettings):
     secret_key: str = 'change-me-to-a-secure-secret'
     algorithm: str = 'HS256'
     access_token_expire_minutes: int = 60
-    db_url: str = 'postgresql+psycopg://erp_user:ErpUser%40123@127.0.0.1:5432/meat_erp'
+    db_url: str = 'postgresql+psycopg://erp_user:ErpUser%40123@localhost:5432/meat_erp'
+    db_sslmode: str = ''
+    cors_allowed_origins: str = ''
     backend_host: str = '127.0.0.1'
-    backend_port: int = 8002
-    cors_allowed_origins: str = 'http://localhost:5173,http://localhost:5174'
-    db_sslmode: str = 'prefer'
+    backend_port: int = 8003
+
+    class Config:
+        env_file = '.env'
 
     @property
     def resolved_db_url(self) -> str:
-        # Accept DATABASE_URL (Render standard) or DB_URL — env vars take priority over field default
         return (
             os.environ.get('DATABASE_URL') or
             os.environ.get('DB_URL') or
@@ -24,31 +25,19 @@ class Settings(BaseSettings):
 
     @property
     def db_conninfo(self) -> str:
-        raw = self.resolved_db_url
-        for prefix in ['postgresql+psycopg2://', 'postgresql+psycopg://', 'postgresql://']:
-            if raw.startswith(prefix):
-                raw = 'postgresql://' + raw[len(prefix):]
-                break
-        p = urlparse(raw)
-        sslmode = os.environ.get('DB_SSLMODE') or self.db_sslmode
-        return (
-            f"host={p.hostname} port={p.port or 5432} "
-            f"dbname={p.path.lstrip('/')} "
-            f"user={p.username} password={unquote(p.password or '')} "
-            f"sslmode={sslmode}"
-        )
+        url = self.resolved_db_url.replace('postgresql+psycopg://', 'postgresql://')
+        if self.db_sslmode:
+            sep = '&' if '?' in url else '?'
+            url = f'{url}{sep}sslmode={self.db_sslmode}'
+        return url
 
     @property
     def db_host(self) -> str:
-        """Returns just the hostname for logging — no credentials."""
         try:
+            from urllib.parse import urlparse
             return urlparse(self.resolved_db_url).hostname or 'unknown'
         except Exception:
             return 'unknown'
-
-    class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
 
 
 settings = Settings()

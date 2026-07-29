@@ -1,6 +1,8 @@
-from pydantic import BaseModel
 from typing import List, Optional
+from pydantic import BaseModel
 
+
+# ── Auth ──────────────────────────────────────────────────────────────────────
 
 class Token(BaseModel):
     access_token: str
@@ -8,7 +10,7 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    email: str | None = None
+    email: Optional[str] = None
 
 
 class UserBase(BaseModel):
@@ -23,48 +25,51 @@ class UserResponse(UserBase):
     id: int
     is_active: bool
 
-    model_config = {"from_attributes": True}
+    class Config:
+        from_attributes = True
 
+
+# ── Admin user management ─────────────────────────────────────────────────────
 
 class UserAdminView(BaseModel):
     id: int
     email: str
-    full_name: str | None = None
-    phone: str | None = None
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
     is_active: bool
     is_admin: bool
+    created_at: Optional[str] = None
+    last_login: Optional[str] = None
     hr_access: bool = False
-    created_at: str | None = None
-    last_login: str | None = None
 
 
 class CreateUserRequest(BaseModel):
     email: str
     password: str
-    full_name: str | None = None
-    phone: str | None = None
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
     is_admin: bool = False
 
 
 class UpdateUserRequest(BaseModel):
-    full_name: str | None = None
-    phone: str | None = None
-    email: str | None = None
-    is_admin: bool | None = None
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    is_admin: Optional[bool] = None
 
 
 class ResetPasswordRequest(BaseModel):
     new_password: str
 
 
-# ── Suppliers ────────────────────────────────────────────
+# ── Suppliers ─────────────────────────────────────────────────────────────────
 
 class SupplierView(BaseModel):
     id: int
     name: str
     contact_person: Optional[str] = None
-    phone: Optional[str] = None
     email: Optional[str] = None
+    phone: Optional[str] = None
     address: Optional[str] = None
     halal_certified: bool = True
     is_active: bool = True
@@ -74,24 +79,22 @@ class SupplierView(BaseModel):
 class CreateSupplierRequest(BaseModel):
     name: str
     contact_person: Optional[str] = None
-    phone: Optional[str] = None
     email: Optional[str] = None
+    phone: Optional[str] = None
     address: Optional[str] = None
-    halal_certified: bool = True
     is_active: bool = True
 
 
 class UpdateSupplierRequest(BaseModel):
     name: Optional[str] = None
     contact_person: Optional[str] = None
-    phone: Optional[str] = None
     email: Optional[str] = None
+    phone: Optional[str] = None
     address: Optional[str] = None
-    halal_certified: Optional[bool] = None
     is_active: Optional[bool] = None
 
 
-# ── Products / Inventory ─────────────────────────────────
+# ── Products ──────────────────────────────────────────────────────────────────
 
 class ProductView(BaseModel):
     id: int
@@ -110,38 +113,26 @@ class ProductView(BaseModel):
 class CreateProductRequest(BaseModel):
     name: str
     category: Optional[str] = None
-    unit: str = 'kg'
     price_per_unit: float
-    stock_qty: float = 0
-    min_threshold: float = 10
-    supplier_id: Optional[int] = None
+    stock_qty: float = 0.0
+    min_threshold: float = 0.0
     is_active: bool = True
 
 
 class UpdateProductRequest(BaseModel):
     name: Optional[str] = None
     category: Optional[str] = None
-    unit: Optional[str] = None
     price_per_unit: Optional[float] = None
     stock_qty: Optional[float] = None
     min_threshold: Optional[float] = None
-    supplier_id: Optional[int] = None
     is_active: Optional[bool] = None
 
 
 class StockAdjustRequest(BaseModel):
     qty_change: float
-    reason: Optional[str] = None
 
 
-# ── Orders ───────────────────────────────────────────────
-
-class OrderItemCreate(BaseModel):
-    product_id: Optional[int] = None
-    product_name: str
-    quantity: float
-    unit_price: float
-
+# ── Orders ────────────────────────────────────────────────────────────────────
 
 class OrderItemView(BaseModel):
     id: int
@@ -152,20 +143,11 @@ class OrderItemView(BaseModel):
     total_price: float
 
 
-class CreateOrderRequest(BaseModel):
-    customer_name: str
-    customer_phone: Optional[str] = None
-    customer_address: Optional[str] = None
-    notes: Optional[str] = None
-    items: List[OrderItemCreate]
-
-
-class UpdateOrderRequest(BaseModel):
-    customer_name: Optional[str] = None
-    customer_phone: Optional[str] = None
-    customer_address: Optional[str] = None
-    status: Optional[str] = None
-    notes: Optional[str] = None
+class CreateOrderItemRequest(BaseModel):
+    product_id: Optional[int] = None
+    product_name: str
+    quantity: float
+    unit_price: float
 
 
 class OrderView(BaseModel):
@@ -182,25 +164,19 @@ class OrderView(BaseModel):
     items: List[OrderItemView] = []
 
 
-# ── Deliveries ───────────────────────────────────────────
-
-class CreateDeliveryRequest(BaseModel):
-    order_id: Optional[int] = None
-    driver_name: Optional[str] = None
-    vehicle: Optional[str] = None
-    scheduled_time: Optional[str] = None
-    delivery_address: Optional[str] = None
+class CreateOrderRequest(BaseModel):
+    customer_name: str
     notes: Optional[str] = None
+    items: List[CreateOrderItemRequest] = []
 
 
-class UpdateDeliveryRequest(BaseModel):
-    driver_name: Optional[str] = None
-    vehicle: Optional[str] = None
-    scheduled_time: Optional[str] = None
-    delivery_address: Optional[str] = None
+class UpdateOrderRequest(BaseModel):
+    customer_name: Optional[str] = None
     status: Optional[str] = None
     notes: Optional[str] = None
 
+
+# ── Deliveries ────────────────────────────────────────────────────────────────
 
 class DeliveryView(BaseModel):
     id: int
@@ -210,6 +186,20 @@ class DeliveryView(BaseModel):
     vehicle: Optional[str] = None
     scheduled_time: Optional[str] = None
     delivery_address: Optional[str] = None
-    status: str
+    status: str = 'scheduled'
     notes: Optional[str] = None
     created_at: Optional[str] = None
+
+
+class CreateDeliveryRequest(BaseModel):
+    order_id: Optional[int] = None
+    driver_name: Optional[str] = None
+    vehicle: Optional[str] = None
+    scheduled_time: Optional[str] = None
+
+
+class UpdateDeliveryRequest(BaseModel):
+    driver_name: Optional[str] = None
+    vehicle: Optional[str] = None
+    scheduled_time: Optional[str] = None
+    status: Optional[str] = None

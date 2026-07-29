@@ -4,8 +4,8 @@ import { login } from '../api/auth';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@alhazmi.com');
-  const [password, setPassword] = useState('Admin@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
@@ -113,7 +113,7 @@ const Login = () => {
             {error && <div className="status-message error">{error}</div>}
 
             <p className="hint-text">
-              Use <strong>admin@alhazmi.com</strong> / <strong>Admin@123</strong> as sample credentials.
+              Login: <strong>admin@alhazmi.com</strong> / <strong>Admin@123</strong>
             </p>
           </section>
         </aside>
