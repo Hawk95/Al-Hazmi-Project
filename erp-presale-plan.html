@@ -1,0 +1,881 @@
+<title>Al Hazmi ERP — Pre-Sale Readiness Plan</title>
+<style>
+  :root {
+    --bg:        #F4F3EF;
+    --surface:   #FFFFFF;
+    --ink:       #0E0F1A;
+    --ink2:      #4A4B5E;
+    --ink3:      #8E8FA8;
+    --rule:      #E2E1DC;
+    --accent:    #4338CA;
+    --accent-bg: rgba(67,56,202,0.07);
+    --crit:      #B91C1C;
+    --crit-bg:   rgba(185,28,28,0.07);
+    --warn:      #92400E;
+    --warn-bg:   rgba(146,64,14,0.07);
+    --ok:        #065F46;
+    --ok-bg:     rgba(6,95,70,0.07);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:        #0D0D12;
+      --surface:   #16161F;
+      --ink:       #EEEDF5;
+      --ink2:      #9899B0;
+      --ink3:      #55566A;
+      --rule:      #24242E;
+      --accent:    #818CF8;
+      --accent-bg: rgba(129,140,248,0.1);
+      --crit:      #F87171;
+      --crit-bg:   rgba(248,113,113,0.09);
+      --warn:      #FCD34D;
+      --warn-bg:   rgba(252,211,77,0.09);
+      --ok:        #34D399;
+      --ok-bg:     rgba(52,211,153,0.09);
+    }
+  }
+
+  :root[data-theme="light"] {
+    --bg: #F4F3EF; --surface: #FFFFFF; --ink: #0E0F1A; --ink2: #4A4B5E;
+    --ink3: #8E8FA8; --rule: #E2E1DC; --accent: #4338CA; --accent-bg: rgba(67,56,202,0.07);
+    --crit: #B91C1C; --crit-bg: rgba(185,28,28,0.07);
+    --warn: #92400E; --warn-bg: rgba(146,64,14,0.07);
+    --ok: #065F46;   --ok-bg: rgba(6,95,70,0.07);
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0D0D12; --surface: #16161F; --ink: #EEEDF5; --ink2: #9899B0;
+    --ink3: #55566A; --rule: #24242E; --accent: #818CF8; --accent-bg: rgba(129,140,248,0.1);
+    --crit: #F87171; --crit-bg: rgba(248,113,113,0.09);
+    --warn: #FCD34D; --warn-bg: rgba(252,211,77,0.09);
+    --ok: #34D399;   --ok-bg: rgba(52,211,153,0.09);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Page shell ── */
+  .page {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .progress-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 8px 14px;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink2);
+    letter-spacing: 0.04em;
+  }
+
+  .progress-track {
+    width: 120px;
+    height: 4px;
+    background: var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+
+  .progress-count {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    min-width: 36px;
+  }
+
+  .btn-print {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: opacity 0.15s;
+  }
+
+  .btn-print:hover { opacity: 0.88; }
+  .btn-print:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ── Document header ── */
+  .doc-header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+  }
+
+  .doc-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 12px;
+  }
+
+  .doc-title {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  .doc-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .doc-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .doc-meta-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink3);
+  }
+
+  .doc-meta-value {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink2);
+  }
+
+  /* ── Summary box ── */
+  .summary-box {
+    background: var(--accent-bg);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 44px;
+    color: var(--ink2);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .summary-box strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Priority section ── */
+  .priority-section {
+    margin-bottom: 40px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .section-title {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .section-sub {
+    font-size: 12px;
+    color: var(--ink3);
+    font-weight: 500;
+  }
+
+  .section-rule {
+    height: 1px;
+    background: var(--rule);
+    margin-bottom: 16px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .badge-crit  { color: var(--crit); background: var(--crit-bg); }
+  .badge-warn  { color: var(--warn); background: var(--warn-bg); }
+  .badge-ok    { color: var(--ok);   background: var(--ok-bg);   }
+  .badge-info  { color: var(--accent); background: var(--accent-bg); }
+
+  /* ── Task rows ── */
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .task {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 12px;
+    align-items: start;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 13px 16px 13px 14px;
+    transition: border-color 0.15s, background 0.15s;
+    cursor: pointer;
+  }
+
+  .task:hover { border-color: var(--accent); }
+
+  .task.done {
+    opacity: 0.55;
+  }
+
+  .task.done .task-title {
+    text-decoration: line-through;
+    text-decoration-color: var(--ink3);
+  }
+
+  /* Custom checkbox */
+  .task-check {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--ink3);
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    margin-top: 1px;
+    flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+  }
+
+  .task-check:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .task-check:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1.5px;
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(42deg);
+  }
+
+  .task-check:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .task-body { min-width: 0; }
+
+  .task-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+
+  .task-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.35;
+  }
+
+  .task-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .effort-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink3);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .task-detail {
+    font-size: 13px;
+    color: var(--ink2);
+    line-height: 1.55;
+  }
+
+  .task-file {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 11.5px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    color: var(--accent);
+    background: var(--accent-bg);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  /* ── Pricing table ── */
+  .pricing-section {
+    margin-bottom: 40px;
+  }
+
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+
+  .price-table th {
+    background: var(--surface);
+    text-align: left;
+    padding: 11px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .price-table td {
+    padding: 13px 16px;
+    font-size: 14px;
+    color: var(--ink2);
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .price-table tr:last-child td { border-bottom: none; }
+
+  .price-table tr:nth-child(even) td { background: var(--bg); }
+
+  .price-highlight {
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* ── Selling points ── */
+  .selling-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .selling-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+
+  .selling-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ok);
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .selling-text {
+    font-size: 13px;
+    color: var(--ink2);
+    line-height: 1.5;
+  }
+
+  .selling-text strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Footer ── */
+  .doc-footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .footer-note {
+    font-size: 12px;
+    color: var(--ink3);
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { background: #fff; color: #000; }
+    .toolbar { display: none; }
+    .page { padding: 24px 0; max-width: 100%; }
+    .task { break-inside: avoid; }
+    .priority-section { break-inside: avoid; }
+    .price-table { break-inside: avoid; }
+    .selling-grid { break-inside: avoid; }
+    .task-check { border-color: #999; }
+    .task-check:checked { background: #333; border-color: #333; }
+    a { color: inherit; }
+  }
+
+  @media (max-width: 560px) {
+    .page { padding: 28px 20px 60px; }
+    .doc-title { font-size: 24px; }
+    .selling-grid { grid-template-columns: 1fr; }
+    .doc-meta { gap: 16px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .progress-fill, .task, .task-check { transition: none; }
+  }
+</style>
+
+<div class="page">
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="progress-chip">
+      <span class="progress-label">Completed</span>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <span class="progress-count" id="progressCount">0 / 12</span>
+    </div>
+    <button class="btn-print" onclick="window.print()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Download PDF
+    </button>
+  </div>
+
+  <!-- Document header -->
+  <header class="doc-header">
+    <div class="doc-eyebrow">Pre-Sale Readiness Plan</div>
+    <h1 class="doc-title">Al Hazmi Meat ERP<br>What to fix before we sell</h1>
+    <div class="doc-meta">
+      <div class="doc-meta-item">
+        <span class="doc-meta-label">Date</span>
+        <span class="doc-meta-value">29 July 2026</span>
+      </div>
+      <div class="doc-meta-item">
+        <span class="doc-meta-label">Prepared for</span>
+        <span class="doc-meta-value">Mian Umair</span>
+      </div>
+      <div class="doc-meta-item">
+        <span class="doc-meta-label">Total tasks</span>
+        <span class="doc-meta-value">12 items across 3 weeks</span>
+      </div>
+      <div class="doc-meta-item">
+        <span class="doc-meta-label">System</span>
+        <span class="doc-meta-value">FastAPI + React + Supabase</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Summary -->
+  <div class="summary-box">
+    The ERP is functionally complete — it covers the full order-to-delivery flow, GPS attendance, VAT returns, payroll, and P&amp;L. <strong>It is not yet safe to hand to a paying client.</strong> Three security holes must be closed first. After that, two weeks of targeted work bring it to a price point of AED 8,000–15,000 per client, or AED 600–1,200/month as a subscription.
+  </div>
+
+  <!-- ── WEEK 1 ── -->
+  <section class="priority-section">
+    <div class="section-header">
+      <span class="badge badge-crit">Critical</span>
+      <h2 class="section-title">Week 1 — Must fix before any client sees it</h2>
+      <span class="section-sub">~1 day total effort</span>
+    </div>
+    <div class="section-rule"></div>
+    <div class="task-list">
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Rotate SECRET_KEY and remove from GitHub history</span>
+            <div class="task-meta">
+              <span class="badge badge-crit">Security</span>
+              <span class="effort-tag">1 hr</span>
+            </div>
+          </div>
+          <p class="task-detail">The current secret key is committed publicly in the GitHub repo. Anyone who finds it can forge JWT login tokens for any user account. Generate a new random key, set it only in Render environment variables, and never commit it to code again.</p>
+          <span class="task-file">render.yaml → move SECRET_KEY to Render dashboard env vars</span>
+        </div>
+      </label>
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Fix hasHRAccess() — currently always returns true</span>
+            <div class="task-meta">
+              <span class="badge badge-crit">Security</span>
+              <span class="effort-tag">1 hr</span>
+            </div>
+          </div>
+          <p class="task-detail">Every logged-in user currently has full HR access regardless of their role. This means any staff member can view payroll and attendance data for all employees. Fix to call /api/auth/me and check the hr_access flag from the server.</p>
+          <span class="task-file">frontend/src/api/auth.js — line 65</span>
+        </div>
+      </label>
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Remove login hint showing admin credentials</span>
+            <div class="task-meta">
+              <span class="badge badge-crit">Security</span>
+              <span class="effort-tag">5 min</span>
+            </div>
+          </div>
+          <p class="task-detail">The login page currently displays "Login: admin@alhazmi.com / Admin@123" visible to anyone who visits the URL. Remove the hint text before sharing the link with clients.</p>
+          <span class="task-file">frontend/src/pages/Login.jsx — hint-text paragraph</span>
+        </div>
+      </label>
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Upgrade Render to paid plan ($7/month)</span>
+            <div class="task-meta">
+              <span class="badge badge-warn">Stability</span>
+              <span class="effort-tag">15 min</span>
+            </div>
+          </div>
+          <p class="task-detail">The free Render tier spins down the backend after 15 minutes of inactivity. The next request takes 20–30 seconds to respond — clients will think the system is broken. The paid tier keeps the server always on.</p>
+          <span class="task-file">render.com → alhazmi-erp-api → Settings → Instance Type</span>
+        </div>
+      </label>
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Make office GPS coordinates configurable per client</span>
+            <div class="task-meta">
+              <span class="badge badge-warn">Multi-client</span>
+              <span class="effort-tag">2 hrs</span>
+            </div>
+          </div>
+          <p class="task-detail">The office latitude/longitude for GPS attendance is hardcoded. Every new client has a different office — right now each one requires a code change and a new deployment. Move these to the admin settings panel so the client can set their own location.</p>
+          <span class="task-file">backend/app/routes/hr.py — lines 16–17 (OFFICE_LAT, OFFICE_LNG)</span>
+        </div>
+      </label>
+
+    </div>
+  </section>
+
+  <!-- ── WEEK 2 ── -->
+  <section class="priority-section">
+    <div class="section-header">
+      <span class="badge badge-warn">Important</span>
+      <h2 class="section-title">Week 2 — Before first client goes live</h2>
+      <span class="section-sub">~3–4 days total effort</span>
+    </div>
+    <div class="section-rule"></div>
+    <div class="task-list">
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Add password reset via email (Forgot Password flow)</span>
+            <div class="task-meta">
+              <span class="badge badge-warn">Feature</span>
+              <span class="effort-tag">1 day</span>
+            </div>
+          </div>
+          <p class="task-detail">The "Forgot password?" button exists on the login page but does nothing. When a client's employee forgets their password, there is currently no way to recover without manually editing the database. Implement email-based reset using SendGrid or Resend (both have free tiers).</p>
+          <span class="task-file">backend/app/routes/auth.py + frontend/src/pages/Login.jsx</span>
+        </div>
+      </label>
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Make company name and logo configurable from Admin panel</span>
+            <div class="task-meta">
+              <span class="badge badge-warn">Multi-client</span>
+              <span class="effort-tag">Half day</span>
+            </div>
+          </div>
+          <p class="task-detail">"Al Hazmi" and "Meat ERP" appear in the sidebar, topbar, login page, and employee portal. A new client needs their own branding. Add a Company Settings page in Admin where the name, logo, and industry can be configured without touching code.</p>
+          <span class="task-file">frontend/src/pages/Home.jsx — header-logo-name, employee portal header</span>
+        </div>
+      </label>
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Configure Supabase automated daily backups</span>
+            <div class="task-meta">
+              <span class="badge badge-warn">Safety</span>
+              <span class="effort-tag">30 min</span>
+            </div>
+          </div>
+          <p class="task-detail">No backup schedule is configured. If data is accidentally deleted or the database is corrupted, there is no recovery path. Enable Point-in-Time Recovery in Supabase dashboard and set up daily backup exports. This is a non-negotiable when a client's business depends on the data.</p>
+          <span class="task-file">supabase.com → Project → Settings → Backups</span>
+        </div>
+      </label>
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Add basic audit log — who did what and when</span>
+            <div class="task-meta">
+              <span class="badge badge-warn">Trust</span>
+              <span class="effort-tag">2 days</span>
+            </div>
+          </div>
+          <p class="task-detail">There is no record of who created, edited, or deleted orders, invoices, or inventory items. If a client disputes a transaction or suspects an employee of tampering, there is nothing to show them. Add an audit_log table that records action, table, record ID, user email, and timestamp for all write operations.</p>
+          <span class="task-file">New: backend/app/routes/audit.py + erp.audit_log table in Supabase</span>
+        </div>
+      </label>
+
+    </div>
+  </section>
+
+  <!-- ── WEEK 3 ── -->
+  <section class="priority-section">
+    <div class="section-header">
+      <span class="badge badge-ok">Nice to have</span>
+      <h2 class="section-title">Week 3 — Increases deal value significantly</h2>
+      <span class="section-sub">~5–6 days total effort</span>
+    </div>
+    <div class="section-rule"></div>
+    <div class="task-list">
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Email notifications for key business events</span>
+            <div class="task-meta">
+              <span class="badge badge-ok">Feature</span>
+              <span class="effort-tag">2–3 days</span>
+            </div>
+          </div>
+          <p class="task-detail">Clients expect to be alerted without having to log in and check. Implement email triggers for: order confirmed, delivery dispatched, invoice overdue, and stock below threshold. Use SendGrid or Resend with simple HTML templates.</p>
+          <span class="task-file">backend/app/services/email.py (new) + hooks in orders, deliveries, stock routes</span>
+        </div>
+      </label>
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">CSV / Excel export for orders, inventory, and customers</span>
+            <div class="task-meta">
+              <span class="badge badge-ok">Feature</span>
+              <span class="effort-tag">1 day</span>
+            </div>
+          </div>
+          <p class="task-detail">Clients will ask for data exports within the first week of use — for accountants, for internal reporting, for their own backups. Add an Export button on the Orders, Inventory, and Customers pages that downloads a CSV file. No library needed; generate the CSV string in the browser from the existing API data.</p>
+          <span class="task-file">frontend/src/pages/Orders.jsx, Inventory.jsx, Customers.jsx</span>
+        </div>
+      </label>
+
+      <label class="task" onclick="handleTask(this)">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-title">Mobile-responsive main ERP (collapsible sidebar)</span>
+            <div class="task-meta">
+              <span class="badge badge-ok">UX</span>
+              <span class="effort-tag">2 days</span>
+            </div>
+          </div>
+          <p class="task-detail">The sidebar disappears completely at 768px and the dashboard becomes unusable on a phone or tablet. Managers who want to check orders or stock while at the warehouse or on-site have no option. Add a hamburger menu that slides the sidebar in as an overlay on small screens.</p>
+          <span class="task-file">frontend/src/pages/Home.jsx + frontend/src/styles.css — mobile breakpoints</span>
+        </div>
+      </label>
+
+    </div>
+  </section>
+
+  <!-- ── Pricing ── -->
+  <section class="pricing-section">
+    <div class="section-header">
+      <span class="badge badge-info">Reference</span>
+      <h2 class="section-title">Pricing guidance</h2>
+    </div>
+    <div class="section-rule"></div>
+
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Milestone</th>
+          <th>One-time sale</th>
+          <th>Monthly SaaS</th>
+          <th>Readiness</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Right now (before any fixes)</td>
+          <td>AED 500–1,500</td>
+          <td>—</td>
+          <td><span class="badge badge-crit">Not ready</span></td>
+        </tr>
+        <tr>
+          <td>After Week 1 fixes</td>
+          <td class="price-highlight">AED 3,000–6,000</td>
+          <td>AED 300–500/mo</td>
+          <td><span class="badge badge-warn">Pilot only</span></td>
+        </tr>
+        <tr>
+          <td>After Week 2 fixes</td>
+          <td class="price-highlight">AED 8,000–15,000</td>
+          <td>AED 600–1,000/mo</td>
+          <td><span class="badge badge-ok">Ready to sell</span></td>
+        </tr>
+        <tr>
+          <td>After Week 3 + custom domain</td>
+          <td class="price-highlight">AED 15,000–25,000</td>
+          <td>AED 1,000–1,800/mo</td>
+          <td><span class="badge badge-ok">Premium</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── Selling points ── -->
+  <section class="priority-section">
+    <div class="section-header">
+      <span class="badge badge-ok">Strengths</span>
+      <h2 class="section-title">What makes this worth the price</h2>
+    </div>
+    <div class="section-rule"></div>
+    <div class="selling-grid">
+      <div class="selling-item">
+        <div class="selling-dot"></div>
+        <div class="selling-text"><strong>GPS-gated attendance portal</strong> — employees check in from their phone, geofenced to the office. Rare in this market, high perceived value.</div>
+      </div>
+      <div class="selling-item">
+        <div class="selling-dot"></div>
+        <div class="selling-text"><strong>UAE VAT return automation</strong> — quarterly VAT filing prepared automatically from sales and purchase data. Mandatory compliance, zero extra work.</div>
+      </div>
+      <div class="selling-item">
+        <div class="selling-dot"></div>
+        <div class="selling-text"><strong>Full order-to-delivery flow</strong> — PO → SO → Invoice → AP → Delivery in one system. No spreadsheets, no switching tools.</div>
+      </div>
+      <div class="selling-item">
+        <div class="selling-dot"></div>
+        <div class="selling-text"><strong>Payroll auto-calculated from attendance</strong> — late arrivals and absences automatically deduct from salary. Eliminates manual payroll errors.</div>
+      </div>
+      <div class="selling-item">
+        <div class="selling-dot"></div>
+        <div class="selling-text"><strong>Built specifically for meat distribution</strong> — kg-based inventory, daily delivery scheduling, salesman distribution tracking. Not a generic ERP.</div>
+      </div>
+      <div class="selling-item">
+        <div class="selling-dot"></div>
+        <div class="selling-text"><strong>Works on any browser, any device</strong> — no app install required. Employee portal opens on any phone via a link.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="doc-footer">
+    <span class="footer-note">Al Hazmi Global Meat Trading — Internal document</span>
+    <span class="footer-note">Generated 29 July 2026</span>
+  </footer>
+
+</div>
+
+<script>
+  const TOTAL = 12;
+
+  function updateProgress() {
+    const checked = document.querySelectorAll('.task-check:checked').length;
+    const pct = Math.round((checked / TOTAL) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressCount').textContent = checked + ' / ' + TOTAL;
+  }
+
+  function handleTask(label) {
+    const cb = label.querySelector('.task-check');
+    // Toggle done class based on checkbox state after click
+    requestAnimationFrame(() => {
+      label.classList.toggle('done', cb.checked);
+    });
+  }
+
+  // Prevent label double-toggle on checkbox direct click
+  document.querySelectorAll('.task-check').forEach(cb => {
+    cb.addEventListener('click', e => e.stopPropagation());
+    cb.addEventListener('change', function() {
+      this.closest('.task').classList.toggle('done', this.checked);
+      updateProgress();
+    });
+  });
+
+  // Remove onclick from labels since we handle via checkbox change
+  document.querySelectorAll('.task').forEach(t => t.removeAttribute('onclick'));
+</script>

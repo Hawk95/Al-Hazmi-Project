@@ -313,6 +313,8 @@ const Home = () => {
           <button className="sidebar-item" type="button" onClick={() => navigate('/forecast')}><Zap size={15} strokeWidth={1.5} />AI Forecast</button>
           {hasHRAccess() && <span className="sidebar-group-label">People</span>}
           {hasHRAccess() && <button className="sidebar-item" type="button" onClick={() => navigate('/hr')}><UserCheck size={15} strokeWidth={1.5} />HR Attendance</button>}
+          <span className="sidebar-group-label">Fleet</span>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/truck-tracking')}><Truck size={15} strokeWidth={1.5} />Truck Tracking</button>
           <span className="sidebar-group-label">Admin</span>
           <button className="sidebar-item" type="button" onClick={() => navigate('/admin/users')}><Users size={15} strokeWidth={1.5} />User Management</button>
         </nav>

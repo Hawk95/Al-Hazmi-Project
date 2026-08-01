@@ -74,6 +74,66 @@ CREATE TABLE IF NOT EXISTS erp.deliveries (
 """)
 print("deliveries ✓")
 
+# ── erp.trucks ────────────────────────────────────────────────────────────────
+cur.execute("""
+CREATE TABLE IF NOT EXISTS erp.trucks (
+    id            SERIAL PRIMARY KEY,
+    plate_number  VARCHAR(20) UNIQUE NOT NULL,
+    driver_name   VARCHAR(100),
+    driver_phone  VARCHAR(20),
+    portal_pin    VARCHAR(6),
+    is_active     BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at    TIMESTAMPTZ DEFAULT NOW()
+)
+""")
+print("trucks     ✓")
+
+# ── erp.truck_trips ───────────────────────────────────────────────────────────
+cur.execute("""
+CREATE TABLE IF NOT EXISTS erp.truck_trips (
+    id          SERIAL PRIMARY KEY,
+    truck_id    INTEGER NOT NULL REFERENCES erp.trucks(id) ON DELETE CASCADE,
+    started_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    ended_at    TIMESTAMPTZ,
+    distance_km NUMERIC(10,3) NOT NULL DEFAULT 0,
+    status      VARCHAR(20) NOT NULL DEFAULT 'active'
+)
+""")
+print("truck_trips ✓")
+
+# ── erp.truck_pings ───────────────────────────────────────────────────────────
+cur.execute("""
+CREATE TABLE IF NOT EXISTS erp.truck_pings (
+    id          SERIAL PRIMARY KEY,
+    truck_id    INTEGER NOT NULL,
+    trip_id     INTEGER REFERENCES erp.truck_trips(id) ON DELETE CASCADE,
+    lat         DOUBLE PRECISION NOT NULL,
+    lng         DOUBLE PRECISION NOT NULL,
+    speed_kmh   NUMERIC(6,2) DEFAULT 0,
+    accuracy_m  NUMERIC(8,2),
+    recorded_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+)
+""")
+cur.execute("CREATE INDEX IF NOT EXISTS idx_truck_pings_trip ON erp.truck_pings(trip_id, recorded_at DESC)")
+cur.execute("CREATE INDEX IF NOT EXISTS idx_truck_pings_truck ON erp.truck_pings(truck_id, recorded_at DESC)")
+print("truck_pings ✓")
+
+# ── erp.truck_stops ───────────────────────────────────────────────────────────
+cur.execute("""
+CREATE TABLE IF NOT EXISTS erp.truck_stops (
+    id               SERIAL PRIMARY KEY,
+    truck_id         INTEGER NOT NULL,
+    trip_id          INTEGER REFERENCES erp.truck_trips(id) ON DELETE CASCADE,
+    lat              DOUBLE PRECISION NOT NULL,
+    lng              DOUBLE PRECISION NOT NULL,
+    arrived_at       TIMESTAMPTZ NOT NULL,
+    departed_at      TIMESTAMPTZ,
+    duration_minutes INTEGER,
+    note             TEXT
+)
+""")
+print("truck_stops ✓")
+
 conn.commit()
 conn.close()
 print("\nMigration complete.")

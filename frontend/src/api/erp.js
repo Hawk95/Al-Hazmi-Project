@@ -134,6 +134,15 @@ export const getBillDetail         = (id)       => api.get(`/stock/bills/${id}`)
 export const updateBill            = (id, data) => api.put(`/stock/bills/${id}`, data).then(r => r.data);
 export const payBill               = (id, data) => api.put(`/stock/bills/${id}/pay`, data).then(r => r.data);
 
+// Truck Tracking
+export const getTrucks        = ()         => api.get('/trucks').then(r => r.data);
+export const createTruck      = (data)     => api.post('/trucks', data).then(r => r.data);
+export const updateTruck      = (id, data) => api.put(`/trucks/${id}`, data).then(r => r.data);
+export const deleteTruck      = (id)       => api.delete(`/trucks/${id}`);
+export const getTruckLive     = ()         => api.get('/trucks/live').then(r => r.data);
+export const getTruckTrips    = (id)       => api.get(`/trucks/${id}/trips`).then(r => r.data);
+export const getTripRoute     = (tripId)   => api.get(`/trucks/trips/${tripId}/route`).then(r => r.data);
+
 // Reports
 export const getReportSummary    = () => api.get('/reports/summary').then(r => r.data);
 export const getOrdersByStatus   = () => api.get('/reports/orders-by-status').then(r => r.data);
