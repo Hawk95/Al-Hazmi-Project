@@ -62,8 +62,8 @@ class PortalLoginReq(BaseModel):
     pin: str
 
 class PingReq(BaseModel):
-    lat: float
-    lng: float
+    lat: Optional[float] = None
+    lng: Optional[float] = None
     speed_kmh: Optional[float] = 0
     accuracy_m: Optional[float] = None
 
@@ -193,6 +193,8 @@ def start_trip(truck_id: int = Depends(require_truck_token), db=Depends(get_db))
 
 @router.post('/portal/ping')
 def send_ping(p: PingReq, truck_id: int = Depends(require_truck_token), db=Depends(get_db)):
+    if p.lat is None or p.lng is None:
+        return {'ok': True, 'skipped': True}
     cur = db.cursor()
     cur.execute("SELECT id FROM erp.truck_trips WHERE truck_id=%s AND status='active' ORDER BY started_at DESC LIMIT 1", (truck_id,))
     row = cur.fetchone()
