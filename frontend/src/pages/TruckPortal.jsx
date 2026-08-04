@@ -168,85 +168,95 @@ export default function TruckPortal() {
   // ── RENDER ────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ minHeight: '100vh', background: '#060a12', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', fontFamily: 'Inter,system-ui,sans-serif', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ minHeight:'100vh', background:'linear-gradient(160deg,#0d0221 0%,#1a0533 35%,#0a1628 70%,#030b18 100%)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'20px 16px', fontFamily:'Inter,system-ui,sans-serif', position:'relative', overflow:'hidden' }}>
       <style>{`
-        @keyframes orb1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
-        @keyframes orb2{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,30px)}}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,0.4)}50%{box-shadow:0 0 0 12px rgba(37,99,235,0)}}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .pin-btn:active{transform:scale(0.93)!important}
-        .plate-inp::placeholder{color:rgba(100,120,160,0.5)}
+        @keyframes drift1{0%,100%{transform:translate(0px,0px) scale(1)}33%{transform:translate(40px,-30px) scale(1.05)}66%{transform:translate(-20px,20px) scale(0.97)}}
+        @keyframes drift2{0%,100%{transform:translate(0px,0px) scale(1)}33%{transform:translate(-35px,25px) scale(1.08)}66%{transform:translate(25px,-15px) scale(0.95)}}
+        @keyframes drift3{0%,100%{transform:translate(0px,0px)}50%{transform:translate(15px,-25px)}}
+        @keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes popIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+        @keyframes glow{0%,100%{box-shadow:0 0 20px 4px rgba(139,92,246,0.5),0 0 60px 10px rgba(59,130,246,0.25)}50%{box-shadow:0 0 30px 8px rgba(139,92,246,0.8),0 0 80px 20px rgba(59,130,246,0.4)}}
+        .pkey{transition:transform 0.1s,background 0.15s,box-shadow 0.15s}
+        .pkey:active{transform:scale(0.88)!important}
+        .plate-inp{transition:border-color 0.2s,box-shadow 0.2s}
+        .plate-inp:focus{border-color:rgba(139,92,246,0.8)!important;box-shadow:0 0 0 3px rgba(139,92,246,0.2)!important;outline:none}
+        .plate-inp::placeholder{color:rgba(255,255,255,0.2)}
       `}</style>
 
-      {/* Animated orbs */}
-      <div style={{ position:'absolute', top:'-15%', left:'-10%', width:350, height:350, borderRadius:'50%', background:'radial-gradient(circle,rgba(37,99,235,0.2) 0%,transparent 70%)', animation:'orb1 9s ease-in-out infinite', pointerEvents:'none' }} />
-      <div style={{ position:'absolute', bottom:'-15%', right:'-10%', width:400, height:400, borderRadius:'50%', background:'radial-gradient(circle,rgba(99,102,241,0.15) 0%,transparent 70%)', animation:'orb2 11s ease-in-out infinite', pointerEvents:'none' }} />
+      {/* Big visible glow orbs */}
+      <div style={{ position:'absolute', top:'-80px', left:'-80px', width:340, height:340, borderRadius:'50%', background:'radial-gradient(circle,rgba(139,92,246,0.55) 0%,rgba(109,40,217,0.2) 40%,transparent 70%)', animation:'drift1 12s ease-in-out infinite', pointerEvents:'none', filter:'blur(2px)' }} />
+      <div style={{ position:'absolute', bottom:'-60px', right:'-60px', width:300, height:300, borderRadius:'50%', background:'radial-gradient(circle,rgba(59,130,246,0.5) 0%,rgba(29,78,216,0.18) 40%,transparent 70%)', animation:'drift2 15s ease-in-out infinite', pointerEvents:'none', filter:'blur(2px)' }} />
+      <div style={{ position:'absolute', top:'40%', right:'-40px', width:180, height:180, borderRadius:'50%', background:'radial-gradient(circle,rgba(236,72,153,0.3) 0%,transparent 70%)', animation:'drift3 9s ease-in-out infinite', pointerEvents:'none' }} />
 
       {/* ── LOGIN ── */}
       {phase === 'login' && (
-        <div style={{ width: '100%', maxWidth: 360, animation:'fadeUp 0.5s ease both' }}>
+        <div style={{ width:'100%', maxWidth:360, zIndex:1 }}>
 
-          {/* Brand */}
-          <div style={{ textAlign: 'center', marginBottom: 36 }}>
-            <div style={{ width: 72, height: 72, borderRadius: 22, background: 'linear-gradient(135deg,#1d4ed8,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 12px 40px rgba(29,78,216,0.5)', animation:'pulse 2.5s ease-in-out infinite' }}>
-              <span style={{ fontSize: 32 }}>🚛</span>
-            </div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: '#f0f4ff', letterSpacing: -0.5 }}>Driver Portal</div>
-            <div style={{ fontSize: 13, color: 'rgba(100,120,160,0.8)', marginTop: 5 }}>Al Hazmi Meat Distribution</div>
+          {/* Top branding */}
+          <div style={{ textAlign:'center', marginBottom:28, animation:'slideDown 0.5s ease both' }}>
+            <div style={{ width:80, height:80, borderRadius:26, background:'linear-gradient(145deg,#7c3aed,#4f46e5,#2563eb)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px', animation:'glow 3s ease-in-out infinite', fontSize:36 }}>🚛</div>
+            <div style={{ fontSize:26, fontWeight:900, color:'#fff', letterSpacing:-0.8, textShadow:'0 2px 20px rgba(139,92,246,0.5)' }}>Driver Portal</div>
+            <div style={{ fontSize:13, color:'rgba(255,255,255,0.4)', marginTop:4, letterSpacing:0.5 }}>AL HAZMI MEAT DISTRIBUTION</div>
           </div>
 
-          {/* Card */}
-          <div style={{ background: 'rgba(13,20,34,0.9)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: 24, padding: '28px 24px', backdropFilter: 'blur(20px)', boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }}>
+          {/* Frosted card */}
+          <div style={{ background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:28, padding:'26px 22px', backdropFilter:'blur(32px)', boxShadow:'0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)', animation:'slideUp 0.5s 0.1s ease both' }}>
 
-            {/* Truck number */}
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(100,120,160,0.8)', marginBottom: 8, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Truck Number</label>
-            <input
-              className="plate-inp"
-              type="text" value={plate}
-              onChange={e => { setPlate(e.target.value.toUpperCase()); setLoginErr(''); }}
-              onKeyDown={e => e.key === 'Enter' && pin.length === 4 && handleLogin()}
-              placeholder="e.g. DXB A71865"
-              autoCorrect="off" autoCapitalize="characters" spellCheck={false}
-              style={{ width: '100%', background: plate ? 'rgba(29,78,216,0.1)' : 'rgba(255,255,255,0.04)', border: `1.5px solid ${plate ? 'rgba(37,99,235,0.6)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 13, padding: '13px 16px', fontSize: 16, color: '#e8f0ff', outline: 'none', boxSizing: 'border-box', caretColor: '#3b82f6', letterSpacing: 2, marginBottom: 24, transition: 'all 0.2s', fontWeight: 600 }}
-            />
-
-            {/* PIN label */}
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(100,120,160,0.8)', marginBottom: 14, letterSpacing: '0.1em', textTransform: 'uppercase', textAlign: 'center' }}>Enter PIN</label>
+            {/* Truck number input */}
+            <div style={{ marginBottom:20 }}>
+              <div style={{ fontSize:10, fontWeight:700, color:'rgba(255,255,255,0.35)', letterSpacing:'0.15em', textTransform:'uppercase', marginBottom:8 }}>Truck Number</div>
+              <input
+                className="plate-inp"
+                type="text" value={plate}
+                onChange={e => { setPlate(e.target.value.toUpperCase()); setLoginErr(''); }}
+                onKeyDown={e => e.key === 'Enter' && pin.length === 4 && handleLogin()}
+                placeholder="DXB A71865"
+                autoCorrect="off" autoCapitalize="characters" spellCheck={false}
+                style={{ width:'100%', background:'rgba(255,255,255,0.07)', border:`1.5px solid ${plate ? 'rgba(139,92,246,0.7)' : 'rgba(255,255,255,0.1)'}`, borderRadius:14, padding:'14px 18px', fontSize:18, color:'#fff', boxSizing:'border-box', caretColor:'#a78bfa', letterSpacing:3, fontWeight:700 }}
+              />
+            </div>
 
             {/* PIN dots */}
-            <div style={{ display: 'flex', gap: 18, justifyContent: 'center', padding: '4px 0 22px' }}>
+            <div style={{ display:'flex', gap:14, justifyContent:'center', margin:'4px 0 18px' }}>
               {[0,1,2,3].map(i => (
                 <div key={i} style={{
-                  width: 16, height: 16, borderRadius: '50%',
-                  background: i < pin.length ? 'linear-gradient(135deg,#3b82f6,#6366f1)' : 'transparent',
-                  border: `2px solid ${i < pin.length ? '#3b82f6' : 'rgba(255,255,255,0.15)'}`,
-                  transition: 'all 0.15s cubic-bezier(0.34,1.56,0.64,1)',
-                  transform: i < pin.length ? 'scale(1.4)' : 'scale(1)',
-                  boxShadow: i < pin.length ? '0 0 14px rgba(59,130,246,0.7)' : 'none',
+                  width:18, height:18, borderRadius:'50%',
+                  background: i < pin.length ? 'linear-gradient(135deg,#a78bfa,#60a5fa)' : 'rgba(255,255,255,0.1)',
+                  boxShadow: i < pin.length ? '0 0 16px rgba(167,139,250,0.9), 0 0 4px rgba(167,139,250,1)' : 'none',
+                  border: `2px solid ${i < pin.length ? 'rgba(167,139,250,0.8)' : 'rgba(255,255,255,0.2)'}`,
+                  transition:'all 0.2s cubic-bezier(0.34,1.56,0.64,1)',
+                  transform: i < pin.length ? 'scale(1.35)' : 'scale(1)',
+                  animation: i < pin.length ? 'popIn 0.25s ease' : 'none',
                 }} />
               ))}
             </div>
 
-            {/* PIN pad */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 18 }}>
+            {/* PIN pad — light glass buttons */}
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:9 }}>
               {['1','2','3','4','5','6','7','8','9','del','0','ok'].map(k => {
                 const isDel = k === 'del', isOk = k === 'ok';
                 const ready = isOk && pin.length === 4 && plate.trim();
                 return (
-                  <button key={k} type="button" className="pin-btn"
+                  <button key={k} type="button" className="pkey"
                     onClick={() => isOk ? handleLogin() : handlePinKey(isDel ? 'del' : k)}
                     disabled={loginLoading}
                     style={{
-                      padding: '18px 0', borderRadius: 14,
-                      fontSize: isOk ? 13 : 24, fontWeight: isOk ? 800 : 300,
+                      padding:'17px 0', borderRadius:16,
+                      fontSize: isDel ? 20 : isOk ? 12 : 26,
+                      fontWeight: isOk ? 800 : isDel ? 600 : 300,
                       cursor: loginLoading ? 'not-allowed' : 'pointer',
-                      background: ready ? 'linear-gradient(135deg,#2563eb,#4f46e5)' : isDel ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)',
-                      border: `1px solid ${ready ? 'rgba(99,102,241,0.6)' : 'rgba(255,255,255,0.07)'}`,
-                      color: ready ? '#fff' : isOk ? 'rgba(255,255,255,0.2)' : '#c7d7f0',
-                      boxShadow: ready ? '0 6px 24px rgba(37,99,235,0.5)' : 'none',
-                      transition: 'all 0.12s ease',
-                      letterSpacing: isOk ? 1 : 0,
+                      background: ready
+                        ? 'linear-gradient(135deg,#7c3aed,#4f46e5)'
+                        : isDel
+                          ? 'rgba(255,255,255,0.05)'
+                          : 'rgba(255,255,255,0.1)',
+                      border: ready
+                        ? '1px solid rgba(167,139,250,0.5)'
+                        : `1px solid rgba(255,255,255,${isDel ? '0.08' : '0.14'})`,
+                      color: ready ? '#fff' : isOk ? 'rgba(255,255,255,0.3)' : '#fff',
+                      boxShadow: ready ? '0 8px 30px rgba(124,58,237,0.6)' : isDel ? 'none' : 'inset 0 1px 0 rgba(255,255,255,0.12)',
+                      letterSpacing: isOk ? 2 : 0,
                     }}>
                     {isDel ? '⌫' : isOk ? (loginLoading ? '…' : 'LOGIN') : k}
                   </button>
@@ -255,13 +265,11 @@ export default function TruckPortal() {
             </div>
 
             {loginErr && (
-              <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, padding: '11px 14px', color: '#fca5a5', fontSize: 13, textAlign: 'center', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
-                <span>⚠</span> {loginErr}
+              <div style={{ marginTop:14, background:'rgba(239,68,68,0.12)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:12, padding:'10px 14px', color:'#fca5a5', fontSize:13, textAlign:'center' }}>
+                ⚠ {loginErr}
               </div>
             )}
           </div>
-
-          <div style={{ textAlign:'center', marginTop:20, fontSize:11, color:'rgba(255,255,255,0.1)' }}>Al Hazmi Meat Distribution</div>
         </div>
       )}
 
