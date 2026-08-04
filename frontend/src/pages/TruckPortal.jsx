@@ -168,70 +168,85 @@ export default function TruckPortal() {
   // ── RENDER ────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ minHeight: '100vh', background: '#080c14', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', fontFamily: 'Inter,system-ui,sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#060a12', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', fontFamily: 'Inter,system-ui,sans-serif', position: 'relative', overflow: 'hidden' }}>
+      <style>{`
+        @keyframes orb1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+        @keyframes orb2{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,30px)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,0.4)}50%{box-shadow:0 0 0 12px rgba(37,99,235,0)}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .pin-btn:active{transform:scale(0.93)!important}
+        .plate-inp::placeholder{color:rgba(100,120,160,0.5)}
+      `}</style>
+
+      {/* Animated orbs */}
+      <div style={{ position:'absolute', top:'-15%', left:'-10%', width:350, height:350, borderRadius:'50%', background:'radial-gradient(circle,rgba(37,99,235,0.2) 0%,transparent 70%)', animation:'orb1 9s ease-in-out infinite', pointerEvents:'none' }} />
+      <div style={{ position:'absolute', bottom:'-15%', right:'-10%', width:400, height:400, borderRadius:'50%', background:'radial-gradient(circle,rgba(99,102,241,0.15) 0%,transparent 70%)', animation:'orb2 11s ease-in-out infinite', pointerEvents:'none' }} />
 
       {/* ── LOGIN ── */}
       {phase === 'login' && (
-        <div style={{ width: '100%', maxWidth: 340 }}>
+        <div style={{ width: '100%', maxWidth: 360, animation:'fadeUp 0.5s ease both' }}>
 
           {/* Brand */}
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <div style={{ width: 60, height: 60, borderRadius: 18, background: 'linear-gradient(135deg,#1d4ed8,#1e40af)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', boxShadow: '0 10px 30px rgba(29,78,216,0.4)' }}>
-              <span style={{ fontSize: 26 }}>🚛</span>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <div style={{ width: 72, height: 72, borderRadius: 22, background: 'linear-gradient(135deg,#1d4ed8,#4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 12px 40px rgba(29,78,216,0.5)', animation:'pulse 2.5s ease-in-out infinite' }}>
+              <span style={{ fontSize: 32 }}>🚛</span>
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: '#f0f4ff', letterSpacing: -0.3 }}>Driver Login</div>
-            <div style={{ fontSize: 13, color: '#3f4d6b', marginTop: 4 }}>Al Hazmi Meat Distribution</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#f0f4ff', letterSpacing: -0.5 }}>Driver Portal</div>
+            <div style={{ fontSize: 13, color: 'rgba(100,120,160,0.8)', marginTop: 5 }}>Al Hazmi Meat Distribution</div>
           </div>
 
           {/* Card */}
-          <div style={{ background: '#0d1422', border: '1px solid #1a2440', borderRadius: 20, padding: '26px 22px' }}>
+          <div style={{ background: 'rgba(13,20,34,0.9)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: 24, padding: '28px 24px', backdropFilter: 'blur(20px)', boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }}>
 
             {/* Truck number */}
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#3f4d6b', marginBottom: 7, letterSpacing: '0.09em', textTransform: 'uppercase' }}>Truck Number</label>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(100,120,160,0.8)', marginBottom: 8, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Truck Number</label>
             <input
+              className="plate-inp"
               type="text" value={plate}
               onChange={e => { setPlate(e.target.value.toUpperCase()); setLoginErr(''); }}
               onKeyDown={e => e.key === 'Enter' && pin.length === 4 && handleLogin()}
-              placeholder="e.g. DXB-A-12345"
+              placeholder="e.g. DXB A71865"
               autoCorrect="off" autoCapitalize="characters" spellCheck={false}
-              style={{ width: '100%', background: '#111a2e', border: `1.5px solid ${plate ? '#1d4ed8' : '#1a2440'}`, borderRadius: 11, padding: '12px 14px', fontSize: 15, color: '#e8f0ff', outline: 'none', boxSizing: 'border-box', caretColor: '#3b82f6', letterSpacing: 1.2, marginBottom: 22 }}
+              style={{ width: '100%', background: plate ? 'rgba(29,78,216,0.1)' : 'rgba(255,255,255,0.04)', border: `1.5px solid ${plate ? 'rgba(37,99,235,0.6)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 13, padding: '13px 16px', fontSize: 16, color: '#e8f0ff', outline: 'none', boxSizing: 'border-box', caretColor: '#3b82f6', letterSpacing: 2, marginBottom: 24, transition: 'all 0.2s', fontWeight: 600 }}
             />
 
             {/* PIN label */}
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#3f4d6b', marginBottom: 10, letterSpacing: '0.09em', textTransform: 'uppercase' }}>PIN</label>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(100,120,160,0.8)', marginBottom: 14, letterSpacing: '0.1em', textTransform: 'uppercase', textAlign: 'center' }}>Enter PIN</label>
 
             {/* PIN dots */}
-            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', padding: '8px 0 18px' }}>
+            <div style={{ display: 'flex', gap: 18, justifyContent: 'center', padding: '4px 0 22px' }}>
               {[0,1,2,3].map(i => (
                 <div key={i} style={{
-                  width: 14, height: 14, borderRadius: '50%',
-                  background: i < pin.length ? '#3b82f6' : '#1a2440',
-                  border: `2px solid ${i < pin.length ? '#3b82f6' : '#243050'}`,
-                  transition: 'all 0.12s',
-                  transform: i < pin.length ? 'scale(1.3)' : 'scale(1)',
-                  boxShadow: i < pin.length ? '0 0 10px rgba(59,130,246,0.5)' : 'none',
+                  width: 16, height: 16, borderRadius: '50%',
+                  background: i < pin.length ? 'linear-gradient(135deg,#3b82f6,#6366f1)' : 'transparent',
+                  border: `2px solid ${i < pin.length ? '#3b82f6' : 'rgba(255,255,255,0.15)'}`,
+                  transition: 'all 0.15s cubic-bezier(0.34,1.56,0.64,1)',
+                  transform: i < pin.length ? 'scale(1.4)' : 'scale(1)',
+                  boxShadow: i < pin.length ? '0 0 14px rgba(59,130,246,0.7)' : 'none',
                 }} />
               ))}
             </div>
 
             {/* PIN pad */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginBottom: 18 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 18 }}>
               {['1','2','3','4','5','6','7','8','9','del','0','ok'].map(k => {
                 const isDel = k === 'del', isOk = k === 'ok';
                 const ready = isOk && pin.length === 4 && plate.trim();
                 return (
-                  <button key={k} type="button"
+                  <button key={k} type="button" className="pin-btn"
                     onClick={() => isOk ? handleLogin() : handlePinKey(isDel ? 'del' : k)}
                     disabled={loginLoading}
                     style={{
-                      padding: '15px 0', borderRadius: 12,
-                      fontSize: isOk ? 13 : 22, fontWeight: isOk ? 700 : 400,
+                      padding: '18px 0', borderRadius: 14,
+                      fontSize: isOk ? 13 : 24, fontWeight: isOk ? 800 : 300,
                       cursor: loginLoading ? 'not-allowed' : 'pointer',
-                      background: ready ? 'linear-gradient(135deg,#2563eb,#1d4ed8)' : isDel ? '#0d1422' : '#111a2e',
-                      border: `1px solid ${ready ? '#2563eb' : '#1a2440'}`,
-                      color: ready ? '#fff' : isOk ? '#243050' : '#8ea8d8',
-                      boxShadow: ready ? '0 4px 18px rgba(37,99,235,0.4)' : 'none',
-                      transition: 'all 0.1s',
+                      background: ready ? 'linear-gradient(135deg,#2563eb,#4f46e5)' : isDel ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)',
+                      border: `1px solid ${ready ? 'rgba(99,102,241,0.6)' : 'rgba(255,255,255,0.07)'}`,
+                      color: ready ? '#fff' : isOk ? 'rgba(255,255,255,0.2)' : '#c7d7f0',
+                      boxShadow: ready ? '0 6px 24px rgba(37,99,235,0.5)' : 'none',
+                      transition: 'all 0.12s ease',
+                      letterSpacing: isOk ? 1 : 0,
                     }}>
                     {isDel ? '⌫' : isOk ? (loginLoading ? '…' : 'LOGIN') : k}
                   </button>
@@ -240,11 +255,13 @@ export default function TruckPortal() {
             </div>
 
             {loginErr && (
-              <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 9, padding: '10px 14px', color: '#fca5a5', fontSize: 13, textAlign: 'center' }}>
-                {loginErr}
+              <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 10, padding: '11px 14px', color: '#fca5a5', fontSize: 13, textAlign: 'center', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+                <span>⚠</span> {loginErr}
               </div>
             )}
           </div>
+
+          <div style={{ textAlign:'center', marginTop:20, fontSize:11, color:'rgba(255,255,255,0.1)' }}>Al Hazmi Meat Distribution</div>
         </div>
       )}
 
