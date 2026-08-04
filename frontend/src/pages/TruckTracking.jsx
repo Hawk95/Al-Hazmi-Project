@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getTrucks, getTruckLive, getTruckTrips, getTripRoute, createTruck, updateTruck, deleteTruck } from '../api/erp';
+import { getTrucks, getTruckLive, getTruckTrips, getTripRoute, createTruck, updateTruck, deleteTruck, getAllFleetTrips, updateTripMeta } from '../api/erp';
 
 // Leaflet is loaded lazily inside useEffect — never at module scope
 let L = null;
@@ -55,6 +55,15 @@ export default function TruckTracking() {
   const [route, setRoute]         = useState(null);
   const [tab, setTab]             = useState('live');   // live | trips | manage
   const [loading, setLoading]     = useState(false);
+
+  // Fleet Data Log
+  const today = new Date().toISOString().slice(0, 10);
+  const monthStart = today.slice(0, 8) + '01';
+  const [fleetData, setFleetData]   = useState([]);
+  const [dataFrom, setDataFrom]     = useState(monthStart);
+  const [dataTo, setDataTo]         = useState(today);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [editNote, setEditNote]     = useState(null);   // { tripId, field, val }
 
   // Manage modal
   const [modal, setModal]         = useState(null);   // null | 'add' | 'edit'
@@ -218,8 +227,35 @@ export default function TruckTracking() {
     try { await deleteTruck(id); await loadTrucks(); } catch {}
   };
 
+  const loadFleetData = async (from, to) => {
+    setDataLoading(true);
+    try { setFleetData(await getAllFleetTrips(from, to)); } catch {}
+    setDataLoading(false);
+  };
+
+  const saveNote = async (tripId, field, val) => {
+    try {
+      await updateTripMeta(tripId, { [field]: val });
+      setFleetData(prev => prev.map(r => r.trip_id === tripId ? { ...r, [field]: val } : r));
+    } catch {}
+    setEditNote(null);
+  };
+
+  const handleTabChange = (t) => {
+    setTab(t);
+    if (t === 'data' && fleetData.length === 0) loadFleetData(dataFrom, dataTo);
+  };
+
+  const fmtDur = (min) => {
+    if (!min) return '—';
+    const h = Math.floor(min / 60), m = min % 60;
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  };
+
   const selectedTruck = trucks.find(t => t.id === selected) || live.find(t => t.id === selected);
   const liveTruck = live.find(t => t.id === selected);
+
+  const td = { padding: '10px 12px', color: '#e2e8f0', borderBottom: '1px solid rgba(255,255,255,0.05)', verticalAlign: 'top' };
 
   return (
     <div style={{ display: 'flex', height: '100vh', background: '#0f1117', fontFamily: 'Inter,system-ui,sans-serif', overflow: 'hidden' }}>
@@ -238,11 +274,11 @@ export default function TruckTracking() {
           </div>
 
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: 4 }}>
-            {['live','trips','manage'].map(t => (
-              <button key={t} onClick={() => setTab(t)}
-                style={{ flex: 1, padding: '6px 0', borderRadius: 7, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', background: tab === t ? 'rgba(99,102,241,0.2)' : 'transparent', color: tab === t ? '#818cf8' : '#4b5563', textTransform: 'capitalize' }}>
-                {t}
+          <div style={{ display: 'flex', gap: 3 }}>
+            {[['live','Live'],['trips','Trips'],['manage','Manage'],['data','📋 Log']].map(([key, label]) => (
+              <button key={key} onClick={() => handleTabChange(key)}
+                style={{ flex: 1, padding: '6px 0', borderRadius: 7, border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer', background: tab === key ? 'rgba(99,102,241,0.2)' : 'transparent', color: tab === key ? '#818cf8' : '#4b5563' }}>
+                {label}
               </button>
             ))}
           </div>
@@ -327,6 +363,47 @@ export default function TruckTracking() {
           </div>
         )}
 
+        {/* ── DATA LOG TAB (left panel filter area) ── */}
+        {tab === 'data' && (
+          <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+            <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Date Range</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+              {[['From', dataFrom, setDataFrom], ['To', dataTo, setDataTo]].map(([lbl, val, set]) => (
+                <div key={lbl}>
+                  <div style={{ fontSize: 10, color: '#4b5563', marginBottom: 4 }}>{lbl}</div>
+                  <input type="date" value={val} onChange={e => set(e.target.value)}
+                    style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 7, padding: '7px 10px', color: '#e2e8f0', fontSize: 13, outline: 'none', boxSizing: 'border-box', colorScheme: 'dark' }} />
+                </div>
+              ))}
+            </div>
+            <button onClick={() => loadFleetData(dataFrom, dataTo)} disabled={dataLoading}
+              style={{ width: '100%', padding: '9px 0', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg,#6366f1,#4f46e5)', color: '#fff', fontSize: 13, fontWeight: 700, cursor: dataLoading ? 'not-allowed' : 'pointer', marginBottom: 16 }}>
+              {dataLoading ? 'Loading…' : 'Load Data'}
+            </button>
+
+            {/* Summary stats */}
+            {fleetData.length > 0 && (() => {
+              const totalKm  = fleetData.reduce((s, r) => s + r.distance_km, 0);
+              const totalMin = fleetData.reduce((s, r) => s + (r.duration_min || 0), 0);
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[
+                    ['Trips', fleetData.length],
+                    ['Distance', `${totalKm.toFixed(1)} km`],
+                    ['Total Time', fmtDur(totalMin)],
+                    ['Trucks', new Set(fleetData.map(r => r.truck_id)).size],
+                  ].map(([lbl, val]) => (
+                    <div key={lbl} style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: '8px 12px' }}>
+                      <span style={{ fontSize: 12, color: '#6b7280' }}>{lbl}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#e2e8f0' }}>{val}</span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
         {/* Driver portal link */}
         <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <div style={{ fontSize: 10, color: '#374151', marginBottom: 5, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Driver Portal Link</div>
@@ -338,9 +415,93 @@ export default function TruckTracking() {
         </div>
       </div>
 
-      {/* ── MAP ── */}
-      <div style={{ flex: 1, position: 'relative' }}>
-        <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+      {/* ── MAP / DATA PANEL ── */}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        <div ref={mapRef} style={{ width: '100%', height: '100%', display: tab === 'data' ? 'none' : 'block' }} />
+
+        {/* ── FLEET DATA LOG TABLE ── */}
+        {tab === 'data' && (
+          <div style={{ position: 'absolute', inset: 0, background: '#0f1117', overflowY: 'auto', padding: '20px 24px' }}>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#f2f2f7' }}>📋 Fleet Data Log</div>
+              {fleetData.length > 0 && <span style={{ fontSize: 12, color: '#4b5563' }}>{fleetData.length} records</span>}
+            </div>
+
+            {dataLoading && <div style={{ color: '#4b5563', fontSize: 14, textAlign: 'center', paddingTop: 60 }}>Loading…</div>}
+            {!dataLoading && fleetData.length === 0 && (
+              <div style={{ color: '#374151', fontSize: 14, textAlign: 'center', paddingTop: 60 }}>No trips found for this date range.<br/>Use the filters on the left and click Load Data.</div>
+            )}
+
+            {!dataLoading && fleetData.length > 0 && (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, minWidth: 860 }}>
+                  <thead>
+                    <tr>
+                      {['Date','Truck','Driver','Start','End','Duration','Distance','Stops','Status','Customer / Note','Route'].map(h => (
+                        <th key={h} style={{ padding: '10px 12px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: '#4b5563', textTransform: 'uppercase', letterSpacing: '0.07em', borderBottom: '1px solid rgba(255,255,255,0.07)', whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {fleetData.map((r, i) => (
+                      <tr key={r.trip_id} style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)' }}>
+                        <td style={td}>{r.started_at?.slice(0, 10) || '—'}</td>
+                        <td style={{ ...td, fontWeight: 700, color: '#818cf8', letterSpacing: 0.5 }}>{r.plate_number}</td>
+                        <td style={{ ...td, color: '#9ca3af' }}>{r.driver_name || '—'}</td>
+                        <td style={td}>{r.started_at?.slice(11, 16) || '—'}</td>
+                        <td style={td}>{r.ended_at?.slice(11, 16) || <span style={{ color: '#10b981' }}>ongoing</span>}</td>
+                        <td style={td}>{fmtDur(r.duration_min)}</td>
+                        <td style={{ ...td, fontWeight: 600, color: '#e2e8f0' }}>{r.distance_km} km</td>
+                        <td style={{ ...td, textAlign: 'center' }}>{r.stop_count}</td>
+                        <td style={td}>
+                          <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: r.status === 'active' ? 'rgba(16,185,129,0.15)' : 'rgba(107,114,128,0.12)', color: r.status === 'active' ? '#10b981' : '#6b7280' }}>
+                            {r.status === 'active' ? '▶ Live' : 'Done'}
+                          </span>
+                        </td>
+                        <td style={{ ...td, minWidth: 180 }}>
+                          {editNote?.tripId === r.trip_id ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                              <input autoFocus value={editNote.customerVal}
+                                onChange={e => setEditNote(n => ({ ...n, customerVal: e.target.value }))}
+                                placeholder="Customer / ref"
+                                style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(99,102,241,0.4)', borderRadius: 6, padding: '4px 8px', color: '#e2e8f0', fontSize: 12, outline: 'none', width: '100%', boxSizing: 'border-box' }} />
+                              <input value={editNote.noteVal}
+                                onChange={e => setEditNote(n => ({ ...n, noteVal: e.target.value }))}
+                                placeholder="Note"
+                                style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(99,102,241,0.4)', borderRadius: 6, padding: '4px 8px', color: '#e2e8f0', fontSize: 12, outline: 'none', width: '100%', boxSizing: 'border-box' }} />
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <button onClick={() => saveNote(r.trip_id, 'customer_ref', editNote.customerVal).then(() => saveNote(r.trip_id, 'note', editNote.noteVal))}
+                                  style={{ flex: 1, padding: '3px 0', borderRadius: 5, border: 'none', background: '#4f46e5', color: '#fff', fontSize: 11, cursor: 'pointer', fontWeight: 600 }}>Save</button>
+                                <button onClick={() => setEditNote(null)}
+                                  style={{ flex: 1, padding: '3px 0', borderRadius: 5, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: '#6b7280', fontSize: 11, cursor: 'pointer' }}>✕</button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div onClick={() => setEditNote({ tripId: r.trip_id, customerVal: r.customer_ref, noteVal: r.note })}
+                              style={{ cursor: 'pointer', padding: '4px 6px', borderRadius: 6, border: '1px solid transparent', transition: 'all 0.1s' }}
+                              onMouseEnter={e => e.currentTarget.style.borderColor='rgba(255,255,255,0.1)'}
+                              onMouseLeave={e => e.currentTarget.style.borderColor='transparent'}>
+                              {r.customer_ref && <div style={{ fontSize: 12, color: '#a78bfa', fontWeight: 600 }}>{r.customer_ref}</div>}
+                              {r.note && <div style={{ fontSize: 11, color: '#6b7280', fontStyle: 'italic' }}>{r.note}</div>}
+                              {!r.customer_ref && !r.note && <span style={{ fontSize: 11, color: '#374151' }}>+ add note</span>}
+                            </div>
+                          )}
+                        </td>
+                        <td style={td}>
+                          <button onClick={() => { setSelected(r.truck_id); loadRoute(r.trip_id); handleTabChange('trips'); }}
+                            style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 6, padding: '4px 10px', color: '#818cf8', fontSize: 11, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                            View Map
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Stop details overlay */}
         {route?.stops?.length > 0 && (

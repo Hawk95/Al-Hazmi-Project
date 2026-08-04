@@ -142,6 +142,8 @@ export const deleteTruck      = (id)       => api.delete(`/trucks/${id}`);
 export const getTruckLive     = ()         => api.get('/trucks/live').then(r => r.data);
 export const getTruckTrips    = (id)       => api.get(`/trucks/${id}/trips`).then(r => r.data);
 export const getTripRoute     = (tripId)   => api.get(`/trucks/trips/${tripId}/route`).then(r => r.data);
+export const getAllFleetTrips  = (from, to) => api.get('/trucks/trips/all', { params: { from_date: from || undefined, to_date: to || undefined } }).then(r => r.data);
+export const updateTripMeta   = (id, data) => api.patch(`/trucks/trips/${id}`, data).then(r => r.data);
 
 // Reports
 export const getReportSummary    = () => api.get('/reports/summary').then(r => r.data);

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
 from pydantic import BaseModel
@@ -42,6 +42,10 @@ def require_truck_token(creds: HTTPAuthorizationCredentials = Depends(_truck_bea
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
+
+class TripMetaUpdate(BaseModel):
+    note: Optional[str] = None
+    customer_ref: Optional[str] = None
 
 class TruckCreate(BaseModel):
     plate_number: str
@@ -117,6 +121,69 @@ def delete_truck(tid: int, _=Depends(get_current_user), db=Depends(get_db)):
     cur = db.cursor()
     cur.execute('DELETE FROM erp.trucks WHERE id=%s RETURNING id', (tid,))
     if not cur.fetchone(): raise HTTPException(404, 'Truck not found')
+
+
+# ── Admin: Fleet Data Log ─────────────────────────────────────────────────────
+
+@router.get('/trips/all')
+def all_fleet_trips(
+    from_date: Optional[str] = Query(None),
+    to_date: Optional[str] = Query(None),
+    _=Depends(get_current_user),
+    db=Depends(get_db)
+):
+    cur = db.cursor()
+    conditions, params = [], []
+    if from_date:
+        conditions.append("tr.started_at >= %s::date")
+        params.append(from_date)
+    if to_date:
+        conditions.append("tr.started_at < (%s::date + '1 day'::interval)")
+        params.append(to_date)
+    where = ('WHERE ' + ' AND '.join(conditions)) if conditions else ''
+    cur.execute(f'''
+        SELECT tr.id, t.id, t.plate_number, t.driver_name,
+               tr.started_at, tr.ended_at, tr.distance_km, tr.status,
+               (SELECT COUNT(*) FROM erp.truck_stops WHERE trip_id=tr.id),
+               tr.note, tr.customer_ref
+        FROM erp.truck_trips tr
+        JOIN erp.trucks t ON t.id = tr.truck_id
+        {where}
+        ORDER BY tr.started_at DESC
+        LIMIT 500
+    ''', params)
+    rows = []
+    for r in cur.fetchall():
+        s, e = r[4], r[5]
+        dur = int((e - s).total_seconds() / 60) if s and e else None
+        rows.append({
+            'trip_id': r[0], 'truck_id': r[1],
+            'plate_number': r[2], 'driver_name': r[3],
+            'started_at': str(s)[:19] if s else None,
+            'ended_at': str(e)[:19] if e else None,
+            'duration_min': dur,
+            'distance_km': round(float(r[6] or 0), 2),
+            'status': r[7], 'stop_count': int(r[8]),
+            'note': r[9] or '', 'customer_ref': r[10] or '',
+        })
+    return rows
+
+
+@router.patch('/trips/{trip_id}')
+def update_trip_meta(trip_id: int, p: TripMetaUpdate, _=Depends(get_current_user), db=Depends(get_db)):
+    cur = db.cursor()
+    fields, vals = [], []
+    if p.note is not None:
+        fields.append('note=%s'); vals.append(p.note)
+    if p.customer_ref is not None:
+        fields.append('customer_ref=%s'); vals.append(p.customer_ref)
+    if not fields:
+        raise HTTPException(400, 'Nothing to update')
+    vals.append(trip_id)
+    cur.execute(f"UPDATE erp.truck_trips SET {','.join(fields)} WHERE id=%s RETURNING id", vals)
+    if not cur.fetchone():
+        raise HTTPException(404, 'Trip not found')
+    return {'ok': True}
 
 
 # ── Admin: Live map & history ─────────────────────────────────────────────────
