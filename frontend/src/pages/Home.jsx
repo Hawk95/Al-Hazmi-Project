@@ -22,7 +22,7 @@ Chart.defaults.scale.border.display = false;
 import {
   LayoutDashboard, Package, ShoppingCart, Truck, MapPin, BarChart2,
   DollarSign, AlertTriangle, Clock, Plus, UserPlus, FileText, List, Receipt,
-  Search, Bell, Users, RefreshCw, TrendingUp, Zap, UserCheck, ClipboardList, FileCheck, Activity,
+  Search, Bell, Users, RefreshCw, TrendingUp, Zap, UserCheck, ClipboardList, FileCheck, Activity, Settings,
 } from 'lucide-react';
 import { logout, getCurrentUser, hasHRAccess } from '../api/auth';
 import {
@@ -317,6 +317,7 @@ const Home = () => {
           <button className="sidebar-item" type="button" onClick={() => navigate('/truck-tracking')}><Truck size={15} strokeWidth={1.5} />Truck Tracking</button>
           <span className="sidebar-group-label">Admin</span>
           <button className="sidebar-item" type="button" onClick={() => navigate('/admin/users')}><Users size={15} strokeWidth={1.5} />User Management</button>
+          <button className="sidebar-item" type="button" onClick={() => navigate('/admin/settings')}><Settings size={15} strokeWidth={1.5} />Company Settings</button>
         </nav>
         <div className="sidebar-footer">
           <div className="sidebar-footer-avatar">{avatar ? <img src={avatar} alt="avatar" /> : initials[0]}</div>

@@ -13,9 +13,9 @@ router = APIRouter()
 
 DEPARTMENTS = ['Management', 'Drivers', 'Warehouse', 'Sales', 'Office', 'Other']
 
-OFFICE_LAT  = 25.269916
-OFFICE_LNG  = 55.333817
-GEOFENCE_M  = 50           # metres
+OFFICE_LAT  = settings.office_lat
+OFFICE_LNG  = settings.office_lng
+GEOFENCE_M  = settings.geofence_m
 UAE_OFFSET  = timedelta(hours=4)
 
 def _uae_now():

@@ -112,9 +112,6 @@ const Login = () => {
             {status && <div className="status-message info">{status}</div>}
             {error && <div className="status-message error">{error}</div>}
 
-            <p className="hint-text">
-              Login: <strong>admin@alhazmi.com</strong> / <strong>Admin@123</strong>
-            </p>
           </section>
         </aside>
       </div>

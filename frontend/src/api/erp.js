@@ -145,6 +145,10 @@ export const getTripRoute     = (tripId)   => api.get(`/trucks/trips/${tripId}/r
 export const getAllFleetTrips  = (from, to) => api.get('/trucks/trips/all', { params: { from_date: from || undefined, to_date: to || undefined } }).then(r => r.data);
 export const updateTripMeta   = (id, data) => api.patch(`/trucks/trips/${id}`, data).then(r => r.data);
 
+// Company Settings
+export const getSettings    = ()       => api.get('/settings').then(r => r.data);
+export const updateSettings = (data)   => api.put('/settings', data).then(r => r.data);
+
 // Reports
 export const getReportSummary    = () => api.get('/reports/summary').then(r => r.data);
 export const getOrdersByStatus   = () => api.get('/reports/orders-by-status').then(r => r.data);

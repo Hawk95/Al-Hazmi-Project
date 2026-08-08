@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     cors_allowed_origins: str = ''
     backend_host: str = '127.0.0.1'
     backend_port: int = 8003
+    # Geofence — set per-client in Render env vars
+    office_lat:  float = 25.269916
+    office_lng:  float = 55.333817
+    geofence_m:  int   = 50
 
     class Config:
         env_file = '.env'

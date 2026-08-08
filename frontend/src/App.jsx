@@ -22,6 +22,7 @@ import Forecast         from './pages/Forecast';
 import VATReturn        from './pages/VATReturn';
 import ProfitLoss       from './pages/ProfitLoss';
 import AdminUsers       from './pages/AdminUsers';
+import CompanySettings  from './pages/CompanySettings';
 import { lazy, Suspense } from 'react';
 const TruckTracking = lazy(() => import('./pages/TruckTracking'));
 const TruckPortal   = lazy(() => import('./pages/TruckPortal'));
@@ -66,6 +67,7 @@ function App() {
         <Route path="/vat-return"      element={<RequireAuth><VATReturn /></RequireAuth>} />
         <Route path="/pnl"             element={<RequireAuth><ProfitLoss /></RequireAuth>} />
         <Route path="/admin/users"     element={<RequireAuth><AdminUsers /></RequireAuth>} />
+        <Route path="/admin/settings"  element={<RequireAuth><CompanySettings /></RequireAuth>} />
         <Route path="/truck-tracking"  element={<RequireAuth><Suspense fallback={<div style={{color:'#fff',padding:40}}>Loading map…</div>}><TruckTracking /></Suspense></RequireAuth>} />
         <Route path="/truck-portal"    element={<Suspense fallback={<div style={{background:'#080c14',minHeight:'100vh'}}/>}><TruckPortal /></Suspense>} />
 

@@ -30,11 +30,22 @@ api.interceptors.response.use(
 export async function login(credentials) {
   const response = await api.post('/auth/login', credentials);
   localStorage.setItem('erp_token', response.data.access_token);
+  // Fetch and cache permissions right after token is set
+  try {
+    const me = await api.get('/auth/me');
+    localStorage.setItem('erp_user_meta', JSON.stringify({
+      is_admin:  !!me.data.is_admin,
+      hr_access: !!me.data.hr_access,
+    }));
+  } catch {
+    localStorage.removeItem('erp_user_meta');
+  }
   return response.data;
 }
 
 export function logout() {
   localStorage.removeItem('erp_token');
+  localStorage.removeItem('erp_user_meta');
 }
 
 export function isAuthenticated() {
@@ -63,7 +74,12 @@ export function getCurrentUser() {
 }
 
 export function hasHRAccess() {
-  return true;
+  try {
+    const meta = JSON.parse(localStorage.getItem('erp_user_meta') || '{}');
+    return !!(meta.is_admin || meta.hr_access);
+  } catch {
+    return false;
+  }
 }
 
 export async function getMe() {
