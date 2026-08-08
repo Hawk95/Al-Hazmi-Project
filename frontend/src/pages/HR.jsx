@@ -10,6 +10,7 @@ import {
   getEmployees, createEmployee, updateEmployee, deleteEmployee,
   getAttendance, saveAttendanceBulk, getPayroll,
 } from '../api/erp';
+import Sidebar from '../components/Sidebar';
 
 const DEPARTMENTS = ['Management', 'Drivers', 'Warehouse', 'Sales', 'Office', 'Other'];
 
@@ -179,36 +180,8 @@ export default function HR({ isModal = false, onClose = null }) {
   return (
     <div style={{ display: 'flex', ...(isModal ? { height: '100%' } : { minHeight: '100vh' }), background: 'var(--bg-primary, #13131a)', color: 'var(--text-primary, #f2f2f7)', fontFamily: 'Inter, sans-serif' }}>
 
-      {/* ── Sidebar ── */}
-      <aside className="sidebar" style={{ display: isModal ? 'none' : undefined }}>
-        <div className="sidebar-logo-area">
-          <div className="header-logo-icon">AH</div>
-          <div className="header-logo-text"><span className="header-logo-name">Al Hazmi</span><span className="header-logo-sub">Meat ERP</span></div>
-        </div>
-        <nav className="sidebar-nav">
-          <span className="sidebar-group-label">Main</span>
-          {sb('/dashboard',   <LayoutDashboard size={15} strokeWidth={1.5} />, 'Overview')}
-          {sb('/inventory',   <Package         size={15} strokeWidth={1.5} />, 'Inventory')}
-          {sb('/orders',      <ShoppingCart    size={15} strokeWidth={1.5} />, 'Orders')}
-          {sb('/suppliers',   <Truck           size={15} strokeWidth={1.5} />, 'Suppliers')}
-          {sb('/deliveries',  <MapPin          size={15} strokeWidth={1.5} />, 'Deliveries')}
-          {sb('/sales',       <TrendingUp      size={15} strokeWidth={1.5} />, 'Sales Distribution')}
-          <span className="sidebar-group-label">Analytics</span>
-          {sb('/reports',     <BarChart2       size={15} strokeWidth={1.5} />, 'Reports')}
-          {sb('/forecast',    <Zap             size={15} strokeWidth={1.5} />, 'AI Forecast')}
-          <span className="sidebar-group-label">People</span>
-          {sb('/hr',          <UserCheck       size={15} strokeWidth={1.5} />, 'HR Attendance', true)}
-          <span className="sidebar-group-label">Admin</span>
-          {sb('/admin/users', <Users           size={15} strokeWidth={1.5} />, 'User Management')}
-        </nav>
-        <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div className="sidebar-footer-avatar">{initials[0]}</div>
-          <div className="sidebar-footer-info">
-            <div className="sidebar-footer-name">{displayName}</div>
-            <div className="sidebar-footer-serial">Al Hazmi ERP</div>
-          </div>
-        </div>
-      </aside>
+      {/* ── Sidebar (hidden when used as modal) ── */}
+      {!isModal && <Sidebar />}
 
       {/* ── Main ── */}
       <main className="dashboard-content page-enter" style={{ paddingTop: 0, ...(isModal ? { flex: 1, minWidth: 0, overflowY: 'auto', overflowX: 'hidden', marginLeft: 0, marginTop: 0 } : {}) }}>

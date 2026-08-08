@@ -9,6 +9,7 @@ import {
 import { getCurrentUser } from '../api/auth';
 import { getUsers, createUser, updateUser, resetPassword, toggleStatus, deleteUser } from '../api/admin';
 import { toggleHRAccess } from '../api/erp';
+import Sidebar from '../components/Sidebar';
 
 const EMPTY_CREATE = { email: '', password: '', full_name: '', phone: '', is_admin: false };
 const EMPTY_EDIT   = { email: '', full_name: '', phone: '', is_admin: false };
@@ -233,45 +234,7 @@ export default function AdminUsers() {
 
   return (
     <div className="dashboard-shell">
-      {/* Sidebar */}
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-logo-area">
-          <div className="header-logo-icon">AH</div>
-          <div className="header-logo-text">
-            <span className="header-logo-name">Al Hazmi</span>
-            <span className="header-logo-sub">Meat ERP</span>
-          </div>
-        </div>
-        <nav className="sidebar-nav">
-          <span className="sidebar-group-label">Main</span>
-          {[
-            { label: 'Overview',   icon: <LayoutDashboard size={15} strokeWidth={1.5} /> },
-            { label: 'Inventory',  icon: <Package size={15} strokeWidth={1.5} /> },
-            { label: 'Orders',     icon: <ShoppingCart size={15} strokeWidth={1.5} /> },
-            { label: 'Suppliers',  icon: <Truck size={15} strokeWidth={1.5} /> },
-            { label: 'Deliveries', icon: <MapPin size={15} strokeWidth={1.5} /> },
-          ].map(item => (
-            <button key={item.label} className="sidebar-item" type="button" onClick={() => navigate('/dashboard')}>
-              {item.icon} {item.label}
-            </button>
-          ))}
-          <span className="sidebar-group-label">Analytics</span>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/dashboard')}>
-            <BarChart2 size={15} strokeWidth={1.5} /> Reports
-          </button>
-          <span className="sidebar-group-label">Admin</span>
-          <button className="sidebar-item active" type="button">
-            <Users size={15} strokeWidth={1.5} /> User Management
-          </button>
-        </nav>
-        <div className="sidebar-footer">
-          <div className="sidebar-footer-avatar">{initials[0]}</div>
-          <div className="sidebar-footer-info">
-            <div className="sidebar-footer-name">{displayName}</div>
-            <div className="sidebar-footer-serial">Administrator</div>
-          </div>
-        </div>
-      </aside>
+      <Sidebar />
 
       {/* Main */}
       <main className="dashboard-content page-enter" style={{ paddingTop: 0 }}>

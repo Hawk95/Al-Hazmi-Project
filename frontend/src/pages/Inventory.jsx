@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { getCurrentUser, hasHRAccess } from '../api/auth';
 import { getProducts, createProduct, updateProduct, adjustStock, deleteProduct } from '../api/erp';
+import Sidebar from '../components/Sidebar';
 
 const CATEGORIES = ['Beef', 'Lamb', 'Chicken', 'Seafood', 'Veal', 'Goat', 'Other'];
 const EMPTY_FORM = { name: '', category: 'Beef', price_per_unit: '', stock_qty: '', min_threshold: '10', is_active: true };
@@ -203,46 +204,7 @@ export default function Inventory() {
 
   return (
     <div className="dashboard-shell">
-      {/* ── Sidebar ── */}
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-logo-area">
-          <div className="header-logo-icon">AH</div>
-          <div className="header-logo-text">
-            <span className="header-logo-name">Al Hazmi</span>
-            <span className="header-logo-sub">Meat ERP</span>
-          </div>
-        </div>
-        <nav className="sidebar-nav">
-          <span className="sidebar-group-label">Main</span>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/dashboard')}><LayoutDashboard size={15} strokeWidth={1.5} />Overview</button>
-          <button className="sidebar-item active" type="button"><Package size={15} strokeWidth={1.5} />Inventory</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/purchase-orders')}><ClipboardList size={15} strokeWidth={1.5} />Purchase Orders</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/sale-orders')}><FileCheck size={15} strokeWidth={1.5} />Sale Orders</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/invoices')}><FileText size={15} strokeWidth={1.5} />Invoices (AR)</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/accounts-payable')}><Receipt size={15} strokeWidth={1.5} />Accounts Payable</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/customers')}><Users size={15} strokeWidth={1.5} />Customers</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/orders')}><ShoppingCart size={15} strokeWidth={1.5} />Orders</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/suppliers')}><Truck size={15} strokeWidth={1.5} />Suppliers</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/deliveries')}><MapPin size={15} strokeWidth={1.5} />Deliveries</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/sales')}><TrendingUp size={15} strokeWidth={1.5} />Sales Distribution</button>
-          <span className="sidebar-group-label">Analytics</span>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/vat-return')}><FileCheck size={15} strokeWidth={1.5} />VAT Return</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/pnl')}><Activity size={15} strokeWidth={1.5} />Profit &amp; Loss</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/reports')}><BarChart2 size={15} strokeWidth={1.5} />Reports</button>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/forecast')}><Zap size={15} strokeWidth={1.5} />AI Forecast</button>
-          {hasHRAccess() && <span className="sidebar-group-label">People</span>}
-          {hasHRAccess() && <button className="sidebar-item" type="button" onClick={() => navigate('/hr')}><UserCheck size={15} strokeWidth={1.5} />HR Attendance</button>}
-          <span className="sidebar-group-label">Admin</span>
-          <button className="sidebar-item" type="button" onClick={() => navigate('/admin/users')}><Users size={15} strokeWidth={1.5} />User Management</button>
-        </nav>
-        <div className="sidebar-footer">
-          <div className="sidebar-footer-avatar">{initials[0]}</div>
-          <div className="sidebar-footer-info">
-            <div className="sidebar-footer-name">{displayName}</div>
-            <div className="sidebar-footer-serial">Al Hazmi ERP</div>
-          </div>
-        </div>
-      </aside>
+      <Sidebar />
 
       <main className="dashboard-content page-enter" style={{ paddingTop: 0 }}>
 
